@@ -1,11 +1,7 @@
 <template>
   <ul>
-    <MusicTopSearchResultItem
-      v-for="item in this.searchResults"
-      :key="item.id"
-      :item="item"
-      :isPlay="isPlay"
-    />
+    <MusicTopSearchResultItem v-for="item in this.searchResults" :key="item.id" :item="item"
+      :nextSongIdWhenPlaying="nextSongIdWhenPlaying" />
   </ul>
 </template>
 
@@ -18,14 +14,14 @@ export default {
   props: ["searchResults"],
   data() {
     return {
-      isPlay: null,
-      // searchResultImgUrl: [],  //搜索结果图片地址
+      nextSongIdWhenPlaying: null,
     };
   },
   mounted() {
-    this.$bus.$on("toPlayListId", (id) => {
-      this.isPlay = id;
+    this.$bus.$on("nextSongIdWhenPlaying", (id) => {
+      this.nextSongIdWhenPlaying = id;
     });
+
   },
 };
 </script>

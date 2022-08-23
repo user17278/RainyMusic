@@ -6,16 +6,36 @@
         <i class="fa fa-search" aria-hidden="true"></i>
       </button>
     </div>
+    <div class="user">
+      <div class="user-logout" :style="{ backgroundColor: loginStatus ? 'royalblue' : 'white' }">
+        <router-link to="/"><i class="fa fa-sign-out" aria-hidden="true"></i></router-link>
+      </div>
+      <div class="user-login" v-on:click="showTheLoginPage" :style="{
+        left: loginStatus ? '32px' : '0px',
+      }">
+        <router-link to="/login"><i class="fa fa-user" aria-hidden="true"></i></router-link>
+      </div>
+
+    </div>
     <div class="search-result-mask" v-show="resultShowing" v-on:click.self="closeResultMask">
-      <div class="search-result">
+      <div class="search-result"
+        :style="{ maxHeight: searchResults.length ? '620px' : '26px', height: searchResults.length ? '' : '26px' }"
+        ref="searchResult">
+        <div class="wait-logo" v-show="!searchResults.length && isSearch"><i class="fa fa-circle-o-notch fa-spin"
+            aria-hidden="true"></i>
+        </div>
         <MusicTopSearchResult :searchResults="searchResults" />
+        <div class="showloading" v-show="isScrollFresh"><i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
+        </div>
       </div>
     </div>
+    <router-view></router-view>
   </div>
 </template>
  
 <script>
 import MusicTopSearchResult from "./MusicTopSearchResult.vue";
+// import LoginPage from "./LoginPage.vue";
 
 export default {
   name: "MusicTop",
@@ -23,25 +43,48 @@ export default {
   components: { MusicTopSearchResult },
   data() {
     return {
-      query: "MEMORIES!", // 默认搜索
+      query: "cold-charix", // 默认搜索
       resultShowing: false, // 搜索栏周围遮罩层
       searchResults: [], //存放搜索结果
       mvIds: [],//mvId
-      searchNum: 6,
+      searchNum: 10,
+      searchOffset: 0,
+      isSearch: false,//是否在搜索
+      isScrollFresh: false,//是否触发滚动刷新
+      loginStatus: false,
     };
   },
   methods: {
+    // getUser: function () {
+    //   return this.$axios.get('https://music.cyrilstudio.top/login/cellphone=' +
+    //     this.query +
+    //     "&limit=" + this.searchNum)
+    // },
+
+    showTheLoginPage: function () {
+      // this.loginStatus = !this.loginStatus
+    },
+
     getSearchResult: function () {
       return this.$axios.get('https://music.cyrilstudio.top/search?keywords=' +
         this.query +
-        "&limit=" + this.searchNum)
+        "&limit=" +
+        this.searchNum +
+        "&offset=" +
+        this.searchOffset)
     },
     getMvId: function () {
       return this.$axios.get('https://music.cyrilstudio.top/search?keywords=' +
         this.query +
+        "&limit=" +
+        this.searchNum +
+        this.searchOffset +
         "&type=1006")
     },
     searchMusic: function () {
+      this.isSearch = true
+      this.searchResults = []//每次重新搜索前清空上次结果
+      this.searchOffset = 0;
       this.resultShowing = true;
       this.$refs.searchInput.style.color = 'black'
       var that = this;
@@ -50,39 +93,34 @@ export default {
           .all([this.getSearchResult(), this.getMvId()])
           .then(this.$axios.spread(function (res1, res2) {
             that.searchResults = res1.data.result.songs;
-            for (let n = 0; n < that.searchNum; n++) {
-              for (let m = 0; m < that.searchNum; m++) {
-                if (that.searchResults[n].id == res2.data.result.songs[m].id) {
-                  // console.log('n有MV');
-                  that.searchResults[m].mvid = res2.data.result.songs[m].id
-                }
-              }
-            }
-            for (let i = 0; i < res1.data.result.songs.length; i++) {
-              var musicIds = res1.data.result.songs[i].id;
-              that.$axios
-                // 获取每首歌曲的详细
-                .get(
-                  // "https://music.cyrilstudio.top/song/detail?cookie=" +
-                  // that.cookie +
-                  // "&ids=" +
-                  // musicIds
-                  "https://music.cyrilstudio.top/song/detail?ids=" + musicIds
-                )
-                // 请求picUrl，添加到searchResults数组中
-                .then(function (res) {
-                  that.$set(
-                    that.searchResults[i],
-                    "picUrl",
-                    res.data.songs[0].al.picUrl
-                  );
-                });
-            }
+            // for (let n = 0; n < that.searchNum; n++) {
+            //   for (let m = 0; m < that.searchNum; m++) {
+            //     if (that.searchResults[n].id == res2.data.result.songs[m].id) {
+            //       console.log(n, '有MV');
+            //       that.searchResults[m].mvid = res2.data.result.songs[m].id
+            //     }
+            //   }
+            // }
           }))
-          ;
       } else {
         that.searchResults = []; //query没输入时，自动清空搜索结果
       }
+    },
+    scrollHandle: function () {
+      //每次滚动到底部size+10
+      this.searchOffset += 10
+      console.log('添加新结果');
+      this.$axios('https://music.cyrilstudio.top/search?keywords=' +
+        this.query +
+        "&limit=" +
+        this.searchNum +
+        "&offset=" +
+        this.searchOffset)
+        .then((res) => {
+          this.searchResults.push(...res.data.result.songs);
+          this.isScrollFresh = false
+        })
+
     },
     showResultMask: function () {
       this.resultShowing = true;
@@ -90,13 +128,24 @@ export default {
     },
     closeResultMask: function () {
       this.resultShowing = false;
+      this.isSearch = false
       this.$refs.searchInput.style.color = '#d6d6d6'
-
     },
   },
   mounted() {
+    this.$bus.$on('loginStatus', (status) => {
+      this.loginStatus = status
+    })
+    const el = this.$refs.searchResult
+    el.onscroll = () => {
+      const [clientHeight, scrollTop, scrollHeight] = [el.clientHeight, el.scrollTop, el.scrollHeight]
+      // !this.isScrollFresh防止连续刷新
+      if (clientHeight + scrollTop == scrollHeight && !this.isScrollFresh) {
+        this.isScrollFresh = true
+        this.scrollHandle()
+      }
+    }
   },
-  beforeDestroy() { },
 };
 </script>
 
@@ -124,7 +173,7 @@ export default {
 }
 
 .search>input {
-  width: 450px;
+  width: 470px;
   padding-left: 30px;
   margin: 0 auto;
   border: none;
@@ -141,6 +190,59 @@ export default {
   cursor: pointer;
   color: #d6d6d6;
   border: none;
+}
+
+.user {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 10px;
+}
+
+.user .user-login {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: solid 2px royalblue;
+  background-color: white;
+  text-align: center;
+  overflow: hidden;
+  transition: .3s;
+}
+
+.islogin {
+  left: 32px;
+}
+
+.user-login i,
+.user-logout i {
+  font-size: 18px;
+  color: royalblue
+}
+
+.user .user-logout {
+  display: inline-block;
+  position: absolute;
+  left: 0px;
+  transform: translateY(-50%);
+  width: 64px;
+  height: 32px;
+  border-radius: 32px;
+  border: solid 2px royalblue;
+  background-color: royalblue;
+  text-align: left;
+}
+
+.user-logout i {
+  margin-left: 16px;
+  transform: translateX(-50%) rotate(180deg);
+  color: white;
 }
 
 .search>button>i {
@@ -160,10 +262,39 @@ export default {
 
 .search-result {
   width: 450px;
-  max-height: 620px;
   margin: 50px auto;
-  border-radius: 20px;
+  border: solid 10px white;
+  border-radius: 16px;
   background-color: white;
   z-index: 999;
+  transition: .8s ease-in-out;
+  overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 16px;
+}
+
+/*滚动条 阴影~圆角*/
+::-webkit-scrollbar-track {
+  border-radius: 16px;
+}
+
+/* 滑块 阴影~ */
+::-webkit-scrollbar-thumb {
+  border-radius: 16px;
+  background-color: #d6d6d6;
+}
+
+.wait-logo,
+.showloading {
+  text-align: center;
+}
+
+.wait-logo i,
+.showloading i {
+  font-size: 18px;
+  color: #d6d6d6;
 }
 </style>

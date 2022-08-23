@@ -12,66 +12,53 @@
       </div>
       <div class="control-btn">
         <div class="heart-fav">
-          <i
-            class="fa fa-heart-o"
-            aria-hidden="true"
-            v-on:click="moveFromFav(favSongItem.id)"
-          ></i>
+          <i class="fa fa-heart-o" aria-hidden="true" v-on:click="moveFromFav"></i>
         </div>
-        <div class="play-now">
-          <i
-            class="fa fa-play"
-            aria-hidden="true"
-            v-on:click="playMusic(favSongItem.id)"
-          ></i>
+        <div class="play-now" v-on:click="playMusic(favSongItem.id)">
+          <i class="fa fa-play" :class="[
+            isPlay == favSongItem.id && playingStatus
+              ? 'fa fa-pause'
+              : 'fa fa-play',
+          ]" aria-hidden="true"></i>
         </div>
       </div>
     </div>
-    <audio :src="favMusicUrl" autoplay></audio>
   </li>
-  <!-- <li>
-            <div class="song-list-fav">
-                <img src="../img/bg.jpg" alt="">
-                <div class="song-list-fav-detail">
-                    <div class="song-list-fav-detail-musicName">123</div>
-                    <div class="song-list-fav-detail-musicAuthor">123</div>
-                </div>
-                <div class="song-list-fav-btn">
-                    <div class="add-fav" v-on:click="addMusicToFav">
-                        <i class="fa fa-heart-o" aria-hidden="true"></i>
-                    </div>
-                    <div class="play-now" v-on:click="playMusic(item.id)">
-                        <i class="fa fa-play" aria-hidden="true"></i>
-                    </div>
-                </div>
-            </div>
-    </li> -->
 </template>
 
 <script>
 export default {
   name: "MusicCenterFavItem",
-  props: ["favSongItem", "cookie", "moveFromFav", "receive"],
+  props: ["favSongItem", "isPlay"],
   data() {
     return {
       favMusicUrl: "",
+      playingStatus: false,
     };
   },
   methods: {
-    playMusic: function (musicId) {
-      var that = this;
-      this.$axios
-        .get(
-          "http://music.cyrilstudio.top/song/url?cookie=" +
-            that.cookie +
-            "&id=" +
-            musicId
-        )
-        .then(function (res) {
-          that.favMusicUrl = res.data.data[0].url;
-        });
+    playMusic(id) {
+      this.$bus.$emit("toPlayListId", id); //判断样式
+      this.$bus.$emit("getPlayingMusicDetail", this.favSongItem);
+    },
+    moveFromFav() {
+      if (this.favStatus) {
+        this.$bus.$emit("getFavMusicDetail", this.favSongItem, this.favStatus); //收藏
+        this.favStatus = false;
+      } else {
+        this.$bus.$emit("getFavMusicDetail", this.favSongItem, this.favStatus); //取消收藏
+        this.favStatus = true;
+      }
     },
   },
+  mounted() {
+    this.$bus.$on("playOrPause", (value) => {
+      this.playingStatus = value;
+    });
+  },
+  beforeDestroy() {
+    this.$bus.$off("playOrPause")
+  }
 };
 </script>
 
@@ -112,10 +99,12 @@ export default {
   display: flex;
   justify-content: flex-end;
 }
+
 .box {
   width: 160px;
   overflow: hidden;
 }
+
 .box span {
   min-width: 100%;
   display: inline-block;
@@ -123,21 +112,27 @@ export default {
   animation: moving 15s linear infinite;
   animation-direction: alternate;
 }
+
 @keyframes moving {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(calc(160px - 100%));
   }
 }
+
 .heart-fav,
 .play-now {
+  width: 30px;
+  height: 30px;
   cursor: pointer;
   margin-right: 10px;
   font-size: 30px;
   color: white;
 }
+
 .heart-fav {
   margin-right: 16px;
 }

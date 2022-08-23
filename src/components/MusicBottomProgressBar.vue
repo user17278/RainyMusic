@@ -2,26 +2,12 @@
   <div class="player-progressBar">
     <span class="current-time time">{{ currentTime | formatSecond }}</span>
     <span class="max-time time">{{ maxTime | formatSecond }}</span>
-    <div
-      class="player-progressBar-box"
-      ref="progressBar"
-      v-on:mousedown="isDown"
-      v-on:mouseup="isUp"
-    >
-      <div
-        class="player-progessBar-box-line"
-        :class="isTransition ? 'onTransition' : 'offTransition'"
-        :style="{ width: isTransition ? progress : progressRate + '%' }"
-        v-show="currentTime"
-      >
-        <div
-          class="player-progressBar-box-drag"
-          :class="isTransition ? 'onTransition' : 'offTransition'"
-          :style="{ left: isTransition ? progress : progressRate + '%' }"
-          v-on:mousedown="isMove"
-          v-on:mouseup="isUp"
-          ref="drag"
-        ></div>
+    <div class="player-progressBar-box" ref="progressBar" v-on:mousedown="isDown" v-on:mouseup="isUp">
+      <div class="player-progessBar-box-line" :class="isTransition ? 'onTransition' : 'offTransition'"
+        :style="{ width: isTransition ? progress : progressRate + '%' }" v-show="currentTime">
+        <div class="player-progressBar-box-drag" :class="isTransition ? 'onTransition' : 'offTransition'"
+          :style="{ left: isTransition ? progress : progressRate + '%' }" v-on:mousedown="isMove" v-on:mouseup="isUp"
+          ref="drag"></div>
       </div>
     </div>
   </div>
@@ -139,9 +125,11 @@ function realFormatSecond(second) {
 .onTransition {
   transition: 0.5s;
 }
+
 .offTransition {
   transition: 0s;
 }
+
 .player-progressBar {
   display: flex;
   position: relative;
@@ -149,23 +137,27 @@ function realFormatSecond(second) {
   justify-content: center;
   align-items: center;
   flex: 1.5;
+
   .time {
     position: absolute;
     margin-top: 50px;
     color: #d6d6d6;
     font-size: 16px;
   }
+
   .player-progressBar-box {
     position: relative;
     width: 96%;
     height: 30px;
-    border: solid 0.3px #d6d6d6;
+    border: solid 2px #d6d6d6;
     border-radius: 12px;
     overflow: hidden;
+
     .player-progessBar-box-line {
       width: 0%;
       height: 30px;
       background-color: royalblue;
+
       .player-progressBar-box-drag {
         position: absolute;
         margin-left: -2px;
@@ -175,19 +167,23 @@ function realFormatSecond(second) {
         box-shadow: 0px 0px 0px 0.5px #d6d6d6;
         background-color: white;
         user-select: none;
+
         &:active {
           background-color: #d6d6d6;
         }
       }
     }
   }
+
   .player-progressBar-box:hover .player-progressBar-box-drag {
     transform: scale(3);
   }
 }
+
 .current-time {
   left: 2%;
 }
+
 .max-time {
   right: 2%;
 }

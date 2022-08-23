@@ -2,7 +2,7 @@
   <div id="main">
     <MusicTop :cookie="cookie"></MusicTop>
     <MusicCenter :cookie="cookie"></MusicCenter>
-    <MusicBottom></MusicBottom>
+    <MusicBottom :cookie="cookie"></MusicBottom>
   </div>
 </template>
 
@@ -40,8 +40,8 @@ export default {
   list-style: none;
 }
 
-
 body {
+
   overflow: hidden;
 }
 

@@ -1,0 +1,155 @@
+*{
+    transition: .3s;
+}
+.next-btn {
+    display: block;
+    width: 26px;
+    height: 26px;
+    margin: 0 auto;
+    text-align: center;
+    transform: rotate(-90deg);
+    cursor: pointer;
+    transition: .3s;
+}
+.next-btn-right1{
+    width: 20px;
+    height: 5px;
+    margin: 0 auto;
+    background-color: #d6d6d6;
+    position: relative;
+    top: 6px;
+    left: 6px;
+    border-radius: 5px;
+    transform: rotate(-50deg);
+}
+.next-btn-right2{
+    width: 20px;
+    height: 5px;
+    margin: 0 auto;
+    background-color: #d6d6d6;
+    position: relative;
+    top: 1px;
+    right: 6px;
+    border-radius: 5px;
+    transform: rotate(50deg);
+}
+.next-btn-right3{
+    width: 20px;
+    height: 5px;
+    margin: 0 auto;
+    background-color: #d6d6d6;
+    position: relative;
+    top: 6px;
+    left: 6px;
+    border-radius: 5px;
+    transform: rotate(-50deg);
+}
+.next-btn-right4{
+    width: 20px;
+    height: 5px;
+    margin: 0 auto;
+    background-color: #d6d6d6;
+    position: relative;
+    top: 1px;
+    right: 6px;
+    border-radius: 5px;
+    transform: rotate(50deg);
+}
+.next-btn-left{
+    position: relative;
+    top: -21px;
+    margin: 0 auto;
+    width: 26px;
+    height: 5px;
+    border-radius: 5px;
+    background-color: #d6d6d6;
+}
+
+.next-btn:hover .next-btn-right1{
+    top: 16px;
+}
+.next-btn:hover .next-btn-right2{
+    top: 11px;
+}
+.next-btn:hover .next-btn-left{
+    top: 5px;
+}
+
+
+
+
+
+
+.back-btn {
+    display: block;
+    width: 26px;
+    height: 26px;
+    margin: 0 auto;
+    text-align: center;
+    transform: rotate(-90deg);
+    cursor: pointer;
+    transition: .3s;
+}
+.back-btn-left1{
+    position: relative;
+    top: 1px;
+    right: 6px;
+    margin: 0 auto;
+    width: 20px;
+    height: 5px;
+    border-radius: 5px;
+    background-color: #d6d6d6;
+    transform: rotate(-50deg);
+}
+.back-btn-left2{
+    position: relative;
+    top: 6px;
+    left: 6px;
+    margin: 0 auto;
+    width: 20px;
+    height: 5px;
+    border-radius: 5px;
+    background-color: #d6d6d6;
+    transform: rotate(50deg);
+}
+.back-btn-left3{
+    width: 20px;
+    height: 5px;
+    margin: 0 auto;
+    background-color: #d6d6d6;
+    position: relative;
+    top: 1px;
+    right: 6px;
+    border-radius: 5px;
+    transform: rotate(-50deg);
+}
+.back-btn-left4{
+    width: 20px;
+    height: 5px;
+    margin: 0 auto;
+    background-color: #d6d6d6;
+    position: relative;
+    top: 6px;
+    left: 6px;
+    border-radius: 5px;
+    transform: rotate(50deg);
+}
+.back-btn-right{
+    position: relative;
+    top: 3px;
+    margin: 0 auto;
+    width: 26px;
+    height: 5px;
+    border-radius: 5px;
+    background-color: #d6d6d6;
+}
+
+.back-btn:hover .back-btn-left1{
+    top: -10px;
+}
+.back-btn:hover .back-btn-left2{
+    top: -3px;
+}
+.back-btn:hover .back-btn-right{
+    top: -23px;
+}

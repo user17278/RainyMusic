@@ -1,40 +1,37 @@
 <template>
   <div class="bottom">
-    <MusicBottomPlayer @toControlPlayOrPause="controlPlayOrPause" @toControlVolume="controlVolume"
-      :playingStatus="playingStatus" :videoUrl="videoUrl" />
+    <MusicBottomPlayer ref="MusicBottomPlayer" @toControlPlayOrPause="controlPlayOrPause"
+      @toControlVolume="controlVolume" :playingStatus="playingStatus" :videoUrl="videoUrl" />
     <audio :src="musicUrl" ref="audio" @pause="onPause" @play="onPlay" @timeupdate="onTimeupdate"
-      @loadedmetadata="onLoadedmetadata"></audio>
+      @loadedmetadata="onLoadedmetadata" @ended="ended"></audio>
   </div>
 </template>
-
+<!-- 播放组件，接收各种URL -->
 <script>
 import MusicBottomPlayer from "./MusicBottomPlayer.vue";
 export default {
   name: "MusicBottom",
   components: { MusicBottomPlayer },
+  props: ["cookie"],
   data() {
     return {
       playingStatus: false, //播放状态 true暂停 false播放
       musicUrl: null,
+      nextSongUrl: null,
       musicId: null,//目前music
       mvId: null,//目前mv
       videoUrl: null,
       currentTime: null,
-      isVideoPlaying: false
+      isVideoPlaying: false,
     };
   },
   methods: {
     //控制播放or暂停
     controlPlayOrPause: function () {
-      if (!this.isVideoPlaying) {
-        console.log(" controlPlayOrPause被执行", this.playingStatus);
-
-        if (this.musicUrl != null) {
-          //有musicUrl才可以控制播放暂停
-          return this.playingStatus ? this.pause() : this.play();
-        }
+      if (this.musicUrl != null && !this.isVideoPlaying) {
+        //有musicUrl且mv不播放才可以控制播放暂停
+        return this.playingStatus ? this.pause() : this.play();
       }
-
     },
     //播放音频
     play: function () {
@@ -65,22 +62,32 @@ export default {
     onLoadedmetadata(res) {
       this.$bus.$emit("getPlayingMaxTime", res.target.duration);
     },
+    // 播放进度
     onTimeupdate(res) {
       this.$bus.$emit("playOrPause", this.playingStatus); //播放后在添加播放状态跟随改变
       this.$bus.$emit("getPlayingCurrentTime", res.target.currentTime);
       this.currentTime = res.target.currentTime;
     },
+    // 播放结束
+    ended() {
+      // 自动切换下一首
+      this.$refs.MusicBottomPlayer.nextSong();
+    }
   },
   computed: {
-    songIsPlay() {
+    // 根据 playingStatus, currentTime 判断是否在播放
+    isSongPlaying() {
       const { playingStatus, currentTime } = this;
       return { playingStatus, currentTime };
     },
   },
   watch: {
+    // 监听musicUrl是否发生变化，同步歌词
     musicUrl: {
       handler(newValue, oldValue) {
         if (newValue != oldValue) {
+          // 切歌前先暂停当前歌曲，否则切歌会导致歌词滚动被上一首歌影响
+          this.playingStatus = false
           //musicUrl更新才会再次获取新歌词
           var that = this
           this.$axios
@@ -92,27 +99,29 @@ export default {
                 this.musicId,
                 this.playingStatus
               );
-              this.$axios.get("https://music.cyrilstudio.top/mv/url?id=" + this.mvId)//开始获取mv地址
-                .then((res) => {
-                  that.$bus.$emit('getMusicVideoUrl', res.data.data.url)
-                  that.videoUrl = res.data.data.url
-                  if (res.data.data.url == null) {
-                    console.log('无法找到视频地址');
-                  }
-                })
+              // // 开始获取mv地址
+              // this.$axios.get("https://music.cyrilstudio.top/mv/url?id=" + this.mvId)
+              //   .then((res) => {
+              //     that.$bus.$emit('getMusicVideoUrl', res.data.data.url)
+              //     that.videoUrl = res.data.data.url
+              //     if (res.data.data.url == null) {
+              //       console.log('无法找到视频地址');
+              //     }
+              //   })
             })
             .then(() => {
               if (!this.isVideoPlaying) this.$refs.audio.play(); //歌词显示后再播放
-
             });
         }
       },
     },
-    songIsPlay: {
+    // 监听音乐是否在播放
+    isSongPlaying: {
       handler(newValue, oldValue) {
-        this.$bus.$emit("toPlayingStatus", newValue, this.currentTime);
+        this.$bus.$emit("getPlayingStatusToLyric", newValue, this.currentTime);
       },
     },
+    // 监听MV是否在播放
     isVideoPlaying: {
       handler(newValue, oldValue) {
         return newValue ? this.pause() : this.play()
@@ -120,27 +129,21 @@ export default {
     }
   },
   mounted() {
-    this.$refs.audio.volume = 0.5; //默认音量
+    this.$refs.audio.volume = 0.1; //默认音量
     this.$bus.$on("getCurrentTimeIndex", (index, maxTime) => {
       this.changeCurrentTime(index, maxTime);
     });
-    this.$bus.$on("getPlayingMusicDetail", (item) => {
-      this.controlPlayOrPause();
-      this.musicId = item.id;
-      this.mvId = item.mvid
-    });
-    this.$bus.$on("getPlayingMusicUrl", (item) => {
-      this.musicUrl = item;
-    });
-    this.$bus.$on('controlVideoShow', (status) => {
-      this.isVideoPlaying = status
+    //添加新的播放，MusicBottom组件audio正在播放的url同步
+    this.$bus.$on('getPlayingMusicUrlToBottom', (url, id) => {
+      this.musicUrl = url;
+      this.musicId = id
     })
   },
   beforeDestroy() {
     this.$bus.$off("getCurrentTimeIndex");
-    this.$bus.$off("getPlayingMusicDetail");
     this.$bus.$off("getPlayingMusicUrl");
     this.$bus.$off('controlVideoShow')
+    this.$bus.$off('getNextSongUrl')
   },
 };
 </script>

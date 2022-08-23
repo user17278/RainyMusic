@@ -2,28 +2,43 @@
   <div class="player">
     <div class="player-btn">
       <div class="player-btn-box">
-        <i class="fa fa-step-backward" aria-hidden="true"></i>
-      </div>
-      <div class="player-btn-box">
-        <!-- <i :class="playingStatus ? 'fa fa-pause' : 'fa fa-play'" aria-hidden="true"
-          @click="sendToControlPlayOrPause"></i> -->
-        <input type="checkbox" id="toggler" :checked="playingStatus" ref="btnCheck"
-          v-on:click="sendToControlPlayOrPause">
-        <label for="toggler">
-          <div class='play-btn'>
-            <span class="sideLeft"></span>
-            <span class='sideRight'>
-              <span class="sideRight1"></span>
-              <span class="sideRight2"></span>
-            </span>
+        <input type="checkbox" id="back-btn" :checked="playingStatus" v-on:click="backSong">
+        <label for="back-btn">
+          <div class='back-btn'>
+            <div class="back-btn-left4"></div>
+            <div class="back-btn-left3"></div>
+            <div class="back-btn-left2"></div>
+            <div class="back-btn-left1"></div>
+            <div class="back-btn-right"></div>
           </div>
         </label>
       </div>
       <div class="player-btn-box">
-        <i class="fa fa-step-forward" aria-hidden="true"></i>
+        <input type="checkbox" id="toggler" ref="playCheck" :checked="playingStatus"
+          v-on:click="sendToControlPlayOrPause" :disabled="!this.nextSongList.length">
+        <label for="toggler">
+          <div class='play-btn'>
+            <div class="sideLeft"></div>
+            <div class="sideRight1"></div>
+            <div class="sideRight2"></div>
+          </div>
+        </label>
       </div>
       <div class="player-btn-box">
-        <i class="fa fa-volume-up" aria-hidden="true" v-on:click="showVolumeBar"></i>
+        <input type="checkbox" id="next-btn" :checked="playingStatus" v-on:click="nextSong">
+        <label for="next-btn">
+          <div class='next-btn'>
+            <div class="next-btn-right1"></div>
+            <div class="next-btn-right2"></div>
+            <div class="next-btn-right3"></div>
+            <div class="next-btn-right4"></div>
+            <div class="next-btn-left"></div>
+          </div>
+        </label>
+      </div>
+      <div class="player-btn-box">
+        <i :class="[{ 'fa fa-volume-off': volumeProgress == 0 }, { 'fa fa-volume-down': volumeProgress <= 50 && volumeProgress != 0 }, { 'fa fa-volume-up': volumeProgress > 50 }]"
+          aria-hidden="true" v-on:click="showVolumeBar"></i>
         <div class="volume-bar-num" :class="{ 'volume-bar-num-hide': isShowVolumeBar == 2 }" ref="volumeBarNum">
           {{ volumeProgress }}
         </div>
@@ -31,8 +46,11 @@
     </div>
     <MusicBottomProgressBar />
     <div class="player-btn">
-      <div class="player-btn-box" id="random-box">
-        <i class="fa fa-random" aria-hidden="true"></i>
+      <div class="player-btn-box" id="next-song-list-box">
+        <i class="fa fa-th-list" aria-hidden="true" v-on:click="nextSongListShow"></i>
+        <div class="next-song-list-num" v-show="nextSongList.length && nextSongList.length <= 2">
+          {{ nextSongList.length }}</div>
+        <div class="next-song-list-num-more" v-show="nextSongList.length && nextSongList.length > 2">99+</div>
       </div>
       <div class="player-btn-box" id="mv-box">
         <i class="fa fa-film" aria-hidden="true" v-on:click="getMv" v-show="this.videoUrl"></i>
@@ -41,48 +59,105 @@
         <!-- <i class="fa fa-stack-exchange" aria-hidden="true"></i> -->
       </div>
       <div class="player-btn-box" id="lyric-box">
-        <i class="fa fa-stack-exchange" aria-hidden="true"></i>
+        <!-- <i class="fa fa-stack-exchange" aria-hidden="true"></i> -->
       </div>
     </div>
-    <div class="volume-bar-mask" v-on:click.self="clickOtherAreaVolumeHide" ref="volumeBarMask"> </div>
+    <div class="next-song-list-mask" v-on:click.self="clickOtherAreaNextSongListHide" ref="nextSongListMask"></div>
+    <div class="next-song-list" :class="[
+      isShowNextSongList == 1 ? 'next-song-list-show' : '',
+      isShowNextSongList == 2 ? 'next-song-list-hide' : ''
+    ]">
+      <div class="next-song-list-trash">
+        <i class="fa fa-trash-o" aria-hidden="true" v-on:click="trashAllSong"></i>
+      </div>
+      <ul>
+        <MusicBottomPlayerList v-for="item in this.nextSongList" :key="item.id" :item="item"
+          :nextSongIdWhenPlaying="nextSongIdWhenPlaying" />
+      </ul>
+    </div>
+    <div class="volume-bar-mask" v-on:click.self="clickOtherAreaVolumeHide" ref="volumeBarMask"></div>
     <div class="volume-bar" :class="[
       isShowVolumeBar == 1 ? 'volume-bar-show' : '',
       isShowVolumeBar == 2 ? 'volume-bar-hide' : '',
-    ]" ref="volumeBar" v-on:mousedown="volumeBarDown">
+    ]" ref="volumeBar" v-on:mouseenter="showVolumeNum" v-on:mousedown="volumeBarDown">
       <div class="volume-bar-line" :class="isTransition ? 'ontransistion' : 'offtransistion'"
         :style="{ width: volumeProgress + '%' }"></div>
       <div class="volume-bar-drag" :class="isTransition ? 'ontransistion' : 'offtransistion'"
         :style="{ left: volumeProgress + '%' }" v-on:mousedown.stop="readyToDrag"></div>
     </div>
-
-
   </div>
-
 </template>
 
 <script>
 import MusicBottomProgressBar from "./MusicBottomProgressBar.vue";
+import MusicBottomPlayerList from "./MusicBottomPlayerList.vue";
 export default {
   name: "MusicBottomPlayer",
-  components: { MusicBottomProgressBar },
+  components: { MusicBottomProgressBar, MusicBottomPlayerList },
   props: ["musicUrl", "playingStatus", 'videoUrl'],
   data() {
     return {
       isTransition: true, //拖拽按钮是否延迟
-      isPlaying: false,
-      volumeProgress: 50, //音量条位置
+      volumeProgress: 10, //音量条位置,
       isShowVolumeBar: 0,
-      showVolumeNum: false,
+      isShowVolumeNum: false,
       numShowTimer: null,
       videoIsPlaying: false,//false没播放 true播放中
+      nextSongList: [],//播放列表数组
+      isPlayingId: null,//正在播放歌曲的Id
+      favStatus: true,
+      playingSongIndex: null,
+      nextSongIdWhenPlaying: null,//点击下一首歌曲后的Id
+      isShowNextSongList: 0
     };
   },
   methods: {
-    sendToControlPlayOrPause: function () {
-      if (!this.musicUrl) {
-        this.isPlaying = !this.isPlaying; //图标切换
+    // 上一首歌曲
+    backSong: function () {
+      this.playingSongIndex = this.nextSongList.findIndex((item) => {
+        return item.id == this.isPlayingId
+      })
+      if (this.nextSongList.length != 1 && this.playingSongIndex < this.nextSongList.length - 1) {
+        this.nextSongList.unshift(this.nextSongList.splice(this.playingSongIndex + 1, 1)[0])
+      } else {
+        this.nextSongList.unshift(this.nextSongList.splice(this.playingSongIndex - this.nextSongList.length, 1)[0])
+        this.isPlayingId = this.nextSongList[this.playingSongIndex].id//最后一首歌返回到第一首循环
       }
-      this.$emit("toControlPlayOrPause");
+    },
+    // 下一首歌曲
+    nextSong: function () {
+      this.playingSongIndex = this.nextSongList.findIndex((item) => {
+        return item.id == this.isPlayingId
+      })
+      if (this.nextSongList.length != 1 && this.playingSongIndex < this.nextSongList.length - 1) {
+        this.nextSongList.unshift(this.nextSongList.splice(this.nextSongList.length - 1, 1)[0])
+      } else {
+        this.nextSongList.unshift(this.nextSongList.splice(this.playingSongIndex - this.nextSongList.length, 1)[0])
+        this.isPlayingId = this.nextSongList[this.playingSongIndex].id//最后一首歌返回到第一首循环
+      }
+    },
+    nextSongListShow: function () {
+      if (this.isShowNextSongList == 0) {
+        this.isShowNextSongList = 1
+        this.$refs.nextSongListMask.style.display = 'block'
+      } else if (this.isShowNextSongList == 1) {
+        this.isShowNextSongList = 2
+        this.$refs.nextSongListMask.style.display = 'none'
+      } else if (this.isShowNextSongList == 2) {
+        this.isShowNextSongList = 1
+        this.$refs.nextSongListMask.style.display = 'block'
+      }
+    },
+    sendToControlPlayOrPause: function () {
+      if (this.nextSongList) {
+        this.$emit("toControlPlayOrPause");
+      }
+    },
+    showVolumeNum: function () {
+      this.isShowVolumeNum = true
+      this.$refs.volumeBar.onmouseleave = () => {
+        this.isShowVolumeNum = false
+      }
     },
     volumeBarDown: function (e) {
       //点击音量框
@@ -99,11 +174,9 @@ export default {
       } else if (this.volumeProgress >= 100) {
         this.volumeProgress = 100;
       }
+      // 控制音量
       this.$emit("toControlVolume", this.volumeProgress);
-      clearTimeout(this.numShowTimer);
-      this.numShowTimer = setTimeout(() => {
-        this.$refs.volumeBarNum.style.opacity = 0;
-      }, 5000);//音量数字消失
+
     },
     readyToDrag: function () {
       this.isTransition = false;
@@ -120,14 +193,15 @@ export default {
         } else if (this.volumeProgress >= 100) {
           this.volumeProgress = 100;
         }
-
+        // 控制音量
+        this.$emit("toControlVolume", this.volumeProgress);
         document.onmouseup = (e) => {
           this.isTransition = true;
           this.$refs.volumeBar.onmousemove = null;
-          clearTimeout(this.numShowTimer);
-          this.numShowTimer = setTimeout(() => {
-            this.$refs.volumeBarNum.style.opacity = 0;
-          }, 5000);//音量数字消失
+          // 移出音量框
+          this.$refs.volumeBar.onmouseleave = () => {
+            this.isShowVolumeNum = false
+          }
         };
         this.$refs.volumeBar.onmouseleave = () => {
           this.$refs.volumeBar.onmousemove = null;
@@ -146,29 +220,116 @@ export default {
         this.$refs.volumeBarMask.style.display = 'block'
       }
     },
-    clickOtherAreaVolumeHide: function (e) {
+    clickOtherAreaVolumeHide: function () {
       this.isShowVolumeBar = 2;
       this.$refs.volumeBarMask.style.display = 'none'
+    },
+    clickOtherAreaNextSongListHide: function () {
+      this.isShowNextSongList = 2
+      this.$refs.nextSongListMask.style.display = 'none'
     },
     getMv: function () {
       this.videoIsPlaying = !this.videoIsPlaying
       this.$bus.$emit('videoBtnClick');//点击收回Fav栏
       this.$bus.$emit('controlVideoShow', this.videoIsPlaying)//控制video是否显示
+    },
+    trashAllSong: function () {
+      this.nextSongList = [];
     }
   },
   watch: {
-    volumeProgress: {
+    isShowVolumeNum: {
       handler(newValue, oldValue) {
-        this.$refs.volumeBarNum.style.opacity = 1;
+        if (newValue) {
+          this.$refs.volumeBarNum.style.opacity = 1;
+        } else {
+          this.$refs.volumeBarNum.style.opacity = 0;
+        }
       },
     },
   },
+  created() {
+    document.onkeyup = (e) => {
+      if (e.key == ' ' || e.code == 'Space') {
+        this.sendToControlPlayOrPause()
+      }
+    }
+  },
+  mounted() {
+    // 从Top获取id后，获取歌曲详细，将图片歌名添加
+    this.$bus.$on("getPlayingMusicId", (id) => {
+      this.isPlayingId = id
+      var that = this
+      const index = this.nextSongList.findIndex(nextSongListItem => {
+        return nextSongListItem.id == id
+      })
+      that.$axios
+        .get("https://music.cyrilstudio.top/song/detail?ids=" + id)
+        // 歌曲详细，添加到nextSongList数组中
+        .then(function (res) {
+          if (index == -1) {
+            that.nextSongList.unshift(res.data.songs[0])
+          } else {
+            that.nextSongList.unshift(that.nextSongList.splice(index, 1)[0])//阻止添加导致出现重复歌曲
+          }
+        });
+      this.$bus.$on('removeSongFromNextSongPlayerList', (id) => {
+        this.nextSongList = this.nextSongList.filter((nextSongList) => {
+          return nextSongList.id !== id
+        })
+      })
 
+    })
+    // 下一首歌曲
+    this.$bus.$on('addNextSongReadyToPlay', (id) => {
+      var that = this
+      const index = this.nextSongList.findIndex(nextSongListItem => {
+        return nextSongListItem.id == id
+      })
+      that.$axios
+        .get("https://music.cyrilstudio.top/song/detail?ids=" + id)
+        // 歌曲详细，添加到nextSongList数组中
+        .then(function (res) {
+          if (index == -1) {
+            that.nextSongList.push(res.data.songs[0])
+          } else {
+            that.nextSongList.push(that.nextSongList.splice(index, 1)[0])//阻止添加导致出现重复歌曲
+          }
+        });
+    })
+  },
+  beforeUpdate() {
+    if (this.nextSongList.length) {
+      const url = 'https://music.163.com/song/media/outer/url?id=' + this.nextSongList[0].id + '.mp3'
+      this.nextSongIdWhenPlaying = this.nextSongList[0].id //点击下一首歌曲后的Id
+      this.$bus.$emit('nextSongIdWhenPlaying', this.nextSongList[0].id)//判断播放状态修改播放按钮样式
+      this.$bus.$emit('getPlayingMusicDetailToCenter', this.nextSongList[0])//添加新的播放，MusicCenter组件中间内容同步
+      this.$bus.$emit('getPlayingMusicUrlToBottom', url, this.nextSongList[0].id)//添加新的播放，MusicBottom组件audio正在播放的url同步
+      this.$bus.$emit('changeLyric', this.playingStatus)
+    }
+    else {
+      this.nextSongList = [{
+        name: '-- -- -- -- -- -- -- -- --',
+        ar: [{ name: '-- -- -- -- -- --' }],
+        al: ''
+      }]
+      this.$bus.$emit('getPlayingMusicDetailToCenter', this.nextSongList[0])//添加新的播放，MusicCenter组件中间内容同步
+      this.$bus.$emit('getPlayingMusicUrlToBottom', '', '')//添加新的播放，MusicBottom组件audio正在播放的url同步
+      this.$bus.$emit("getPlayingMaxTime", 0);
+      this.nextSongList = []
+    }
+  }
 };
 </script>
 
+<style lang="scss" scoped src="./css/playbtn.scss">
+</style>
+<style lang="scss" scoped src="./css/nextsonglist.scss">
+</style>
+<style lang="scss" scoped src="./css/nextbtn.scss">
+</style>
 <style scoped lang='scss'>
-#toggler {
+input {
   display: none;
 }
 
@@ -176,375 +337,12 @@ label {
   margin: 0 auto;
 }
 
-.play-btn {
-  display: block;
-  width: 26px;
-  height: 20px;
-  text-align: center;
-  margin: 0 auto;
-  transform: rotate(-90deg);
-}
-
-.play-btn .sideLeft {
-  display: block;
-  height: 5px;
-  background-color: #d6d6d6;
-  position: relative;
-  top: 0px;
-  border-radius: 5px;
-  animation: sideLeftBack .5s forwards;
-
-}
-
-.play-btn .sideRight {
-  display: block;
-  position: relative;
-}
-
-.play-btn .sideRight span {
-  position: relative;
-  border-radius: 5px;
-  width: 26px;
-  height: 5px;
-  top: 0px;
-  background-color: #d6d6d6;
-
-}
-
-.play-btn .sideRight span:nth-child(1) {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  transform: rotate(-60deg);
-  animation: sideRightBack1 .5s forwards;
-
-}
-
-.play-btn .sideRight span:nth-child(2) {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  transform: rotate(60deg);
-  animation: sideRightBack2 .5s forwards;
-
-}
-
-//开始播放
-#toggler:checked+label .play-btn .sideLeft {
-  // top: 11px;
-  animation: sideLeftMove .5s forwards;
-
-}
-
-#toggler:checked+label .play-btn .sideRight span:nth-child(1) {
-  // top: -6px;
-  // left: 0px;
-  // transform: rotate(0deg);
-  animation: sideRightMove1 .5s forwards;
-}
-
-#toggler:checked+label .play-btn .sideRight span:nth-child(2) {
-  // top: -6px;
-  // right: 0px;
-  // transform: rotate(0deg);
-  animation: sideRightMove2 .5s forwards;
-}
-
-@keyframes sideLeftBack {
-
-  0% {
-    top: 11px
-  }
-
-  100% {
-    top: 0px;
-  }
-}
-
-@keyframes sideLeftMove {
-
-  0% {
-    top: 0px
-  }
-
-  100% {
-    top: 11px;
-  }
-}
-
-@keyframes sideRightBack1 {
-  0% {
-    top: -6px;
-    left: 0px;
-    transform: rotate(0deg)
-  }
-
-  50% {
-    left: 15px;
-    transform: rotate(90deg)
-  }
-
-  100% {
-    top: 6px;
-    left: 6px;
-    transform: rotate(120deg)
-  }
-}
-
-@keyframes sideRightBack2 {
-  0% {
-    top: -6px;
-    right: 0px;
-    transform: rotate(0deg)
-  }
-
-  50% {
-    right: 15px;
-    transform: rotate(-90deg)
-  }
-
-  100% {
-    top: 6px;
-    right: 6px;
-    transform: rotate(-120deg)
-  }
-}
-
-@keyframes sideRightMove1 {
-
-  0% {
-    top: 6px;
-    left: 6px;
-    transform: rotate(120deg)
-  }
-
-  50% {
-    left: 15px;
-    transform: rotate(90deg)
-  }
-
-  100% {
-    top: -6px;
-    left: 0px;
-    transform: rotate(0deg)
-  }
-}
-
-@keyframes sideRightMove2 {
-
-  0% {
-    top: 6px;
-    right: 6px;
-    transform: rotate(-120deg)
-  }
-
-  50% {
-    right: 15px;
-    transform: rotate(-90deg)
-  }
-
-  100% {
-    top: -6px;
-    right: 0px;
-    transform: rotate(0deg)
-  }
-}
-
-.volume-bar-mask {
+.next-song-list-mask {
   content: '';
   width: 100vw;
   height: 100vh;
   position: absolute;
   top: -100vh;
   display: none;
-}
-
-.ontransistion {
-  transition: 0.5s;
-}
-
-.offtransistion {
-  transition: 0s;
-}
-
-.player {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: 69px;
-
-  .player-btn {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    position: relative;
-    z-index: 1;
-
-    .player-btn-box {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      flex: 1;
-      position: relative;
-      text-align: center;
-      box-sizing: border-box;
-      background-color: white;
-
-      .volume-bar-num {
-        position: absolute;
-        left: 50%;
-        bottom: 266px;
-        transform: translate(-50%);
-        color: white;
-        user-select: none;
-        transition: 0.3s;
-        opacity: 0;
-      }
-    }
-
-    i {
-      color: #d6d6d6;
-      font-size: 26px;
-    }
-  }
-
-  .volume-bar {
-    position: absolute;
-    left: 25%;
-    transform: translate(-50%) rotate(270deg);
-    border: solid 0.3px #d6d6d6;
-    border-radius: 16px;
-    background-color: white;
-    overflow: hidden;
-    bottom: 35px;
-
-    .volume-bar-line {
-      width: 20px;
-      height: 100%;
-      background-color: royalblue;
-    }
-
-    .volume-bar-drag {
-      position: absolute;
-      top: 0;
-      width: 2px;
-      height: 40px;
-      left: 20px;
-      box-shadow: 0px 0px 0px 0.5px #d6d6d6;
-      background-color: white;
-      cursor: pointer;
-
-      &:active {
-        background-color: #d6d6d6;
-      }
-    }
-  }
-
-
-
-  .volume-bar-show {
-    animation: volumeShow 1s cubic-bezier(0, 1.63, 0.74, 1.49) forwards;
-  }
-
-  .volume-bar-hide {
-    animation: volumeHide 1s cubic-bezier(0, 1.63, 0.74, 1.49) forwards;
-  }
-
-  .volume-bar-num-hide {
-    animation: volumeNumHide 1s cubic-bezier(0, 1.63, 0.74, 1.49) forwards;
-  }
-
-  .volume-bar:hover .volume-bar-drag {
-    transform: scaleX(5);
-  }
-}
-
-@keyframes volumeShow {
-
-  0%,
-  100% {
-    height: 40px;
-  }
-
-  0% {
-    bottom: 30px;
-    width: 180px;
-    transform: translate(-50%) rotate(270deg) scaleX(0);
-  }
-
-  25% {
-    bottom: 200px;
-    width: 180px;
-    transform: translate(-50%) rotate(270deg) scaleX(1);
-  }
-
-  50% {
-    bottom: 150px;
-    width: 170px;
-    transform: translate(-50%) rotate(270deg) scaleX(1);
-  }
-
-  70% {
-    bottom: 160px;
-    transform: translate(-50%) rotate(270deg) scaleX(1);
-    width: 180px;
-  }
-
-  90%,
-  100% {
-    bottom: 150px;
-    width: 180px;
-    transform: translate(-50%) rotate(270deg) scaleX(1);
-  }
-}
-
-@keyframes volumeHide {
-
-  0%,
-  100% {
-    width: 180px;
-    height: 40px;
-  }
-
-  0% {
-    bottom: 150px;
-    transform: translate(-50%) rotate(270deg) scale(1);
-  }
-
-  50% {
-    bottom: 150px;
-    height: 20px;
-    transform: translate(-50%) rotate(270deg) scale(1);
-  }
-
-  55% {
-    height: 20px;
-    transform: translate(-50%) rotate(270deg) scale(0);
-  }
-
-  100% {
-    bottom: 30px;
-    height: 0px;
-    transform: translate(-50%) rotate(270deg) scale(0);
-  }
-}
-
-@keyframes volumeNumHide {
-
-  0% {
-    bottom: 266px;
-  }
-
-  20% {
-    bottom: 270px;
-  }
-
-  50% {
-    bottom: 270px;
-  }
-
-  100% {
-    bottom: 0px;
-  }
 }
 </style>

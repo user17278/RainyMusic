@@ -1,6 +1,6 @@
 <template>
   <div class="lyric-show" ref="lyricShow">
-    <MusicCenterLyricScroll class="lyric-show-box" v-if="playingStatus" :data="currentLyric && currentLyric.lines"
+    <MusicCenterLyricScroll class="lyric-show-box" v-if="currentLyric" :data="currentLyric && currentLyric.lines"
       ref="lyricList">
       <ul class="content">
         <li v-for="(line, index) in currentLyric.lines" :key="index" :line="line" ref="lyricLine"
@@ -14,58 +14,46 @@
 </template>
 
 <script>
+// import BScroll from "better-scroll";
 import Lyric from "lyric-parser";
 import MusicCenterLyricScroll from "./MusicCenterLyricScroll.vue";
+// import MusicCenterLyricContent from "./MusicCenterLyricContent.vue";
 export default {
   name: "MusicCenterLyric",
   components: { MusicCenterLyricScroll },
+  // components: { MusicCenterLyricContent },
   data() {
     return {
       currentLyric: null,
       currentLineNum: 0,
       currentSongId: null,
-      playingStatus: false
     };
   },
   methods: {
     handleLyric: function ({ lineNum, txt }) {
-      if (lineNum) {
+      if (lineNum > 0) {
         //v-for循环，所以this.$refs.lyricLine是一个数组，从而获取相应DOM
-        // let lyricEl = this.$refs.lyricLine[lineNum];
+        let lyricEl = this.$refs.lyricLine[lineNum];
         //调用scroll组件API
-        // this.$refs.lyricList.scrollToElement(lyricEl, 1000);
-        let lineEl = this.$refs.lyricLine[lineNum]
-        if (this.$refs.lyricList) {
-          this.$nextTick(() => {
-            this.$refs.lyricList.scrollToElement(lineEl, 1000)
-          })
-        }
+        this.$refs.lyricList.scrollToElement(lyricEl, 1000);
       } else {
-        if (this.$refs.lyricList) {
-          this.$nextTick(() => {
-            this.$refs.lyricList.scrollTo(0, 0, 1000)
-          })
-        }
+        // 如果小于5，则滚动制顶部
+        this.$refs.lyricList.scrollTo(0, 0, 1000);
       }
       this.currentLineNum = lineNum;
     },
   },
   mounted() {
     this.$nextTick(() => {
-      this.$bus.$on("toCurrentLyric", (lyric, songId) => {
-        this.currentLyric = null//清空原歌词
-        this.currentLineNum = 0//切歌恢复当前行 
+      this.$bus.$on("toCurrentLyric", (lyric, songId, playingStatus) => {
         this.currentSongId = songId;
         this.currentLyric = new Lyric(lyric, this.handleLyric);
         this.currentLyric.play();
       });
-      // 点击暂停按钮暂停歌词滚动
-      this.$bus.$on("getPlayingStatusToLyric", (songIsPlay) => {
-        this.playingStatus = songIsPlay.playingStatus
+      this.$bus.$on("toPlayingStatus", (songIsPlay) => {
         if (!songIsPlay.playingStatus) {
           this.currentLyric.stop();
         } else {
-          // 拖动进度条歌词同步
           this.currentLyric.seek(songIsPlay.currentTime * 1000);
         }
       });
@@ -87,7 +75,7 @@ export default {
   align-items: center;
   background: royalblue;
   overflow: hidden;
-  transition: .8s cubic-bezier(.27, -0.01, .34, 1);
+  transition: 1s;
 }
 
 .lyric-show-layer {
@@ -101,6 +89,7 @@ export default {
       rgba(255, 255, 255, 0) 40%,
       rgba(255, 255, 255, 0) 60%,
       rgba(65, 105, 225, 1) 80%);
+  /* z-index: 9;   */
 }
 
 .lyric-show-box {
@@ -114,8 +103,7 @@ export default {
 }
 
 li {
-  margin: 0px 45px;
-  margin-bottom: 20px;
+  margin: 20px 30px;
   text-align: center;
   color: rgb(135, 164, 253);
   font-size: 16px;

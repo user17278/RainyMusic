@@ -4,9 +4,7 @@
       v-for="item in this.searchResults"
       :key="item.id"
       :item="item"
-      :addSongToFav="addSongToFav"
-      :playMusic="playMusic"
-      :moveFromFav="moveFromFav"
+      :isPlay="isPlay"
     />
   </ul>
 </template>
@@ -17,11 +15,17 @@ import MusicTopSearchResultItem from "./MusicTopSearchResultItem.vue";
 export default {
   name: "MusicTopSearchResult",
   components: { MusicTopSearchResultItem },
-  props: ["searchResults", "addSongToFav", "playMusic", "moveFromFav"],
+  props: ["searchResults"],
   data() {
     return {
+      isPlay: null,
       // searchResultImgUrl: [],  //搜索结果图片地址
     };
+  },
+  mounted() {
+    this.$bus.$on("toPlayListId", (id) => {
+      this.isPlay = id;
+    });
   },
 };
 </script>
