@@ -25,10 +25,10 @@ export default {
     },
   },
   mounted() {
+    var that = this
     this.$bus.$on("nextSongIdWhenPlaying", (id) => {
       this.nextSongIdWhenPlaying = id;
     });
-    var that = this
     this.$bus.$on("addFavMusicToCenterFav", (id, favStatus) => {
       if (!favStatus) {
         that.$axios
@@ -44,10 +44,18 @@ export default {
       const index = this.favSongArr.findIndex((item) => item.id == id)
       this.favSongArr.splice(index, 1)
     })
-
   },
   beforeUpdate() {
-    this.$store.commit('addToFavSongArr', this.favSongArr)
+    // 已登录收藏
+    if (this.$store.state.loginStatus) {
+      this.$store.commit('addToFavSongArr', this.favSongArr)
+      this.$axios.post('http://127.0.0.1:3000/fav/addFav', {
+        favId: this.$store.state.favSongArr,
+        username: this.$store.state.username
+      }, {
+        headers: { "Authorization": this.$store.state.token }
+      })
+    }
   },
   beforeDestroy() {
     this.$bus.$off("nextSongIdWhenPlaying");

@@ -13,13 +13,22 @@
           <i class="fa fa-plus" aria-hidden="true"></i>
         </div>
         <div class="add-fav" v-on:click="favMusic(item)">
-          <i :class="[favStatus ? 'fa fa-heart' : 'fa fa-heart-o']" :style="{ color: (favStatus ? '#ff8282' : '') }"
-            aria-hidden="true"></i>
+          <i
+            :class="[favStatus ? 'fa fa-heart' : 'fa fa-heart-o']"
+            :style="{ color: favStatus ? '#ff8282' : '' }"
+            aria-hidden="true"
+          ></i>
         </div>
         <div class="play-now" v-on:click="playMusic(item.id)">
-          <i class="fa fa-play" :class="[
-            nextSongIdWhenPlaying == item.id && playingStatus ? 'fa fa-pause' : 'fa fa-play',
-          ]" aria-hidden="true"></i>
+          <i
+            class="fa fa-play"
+            :class="[
+              nextSongIdWhenPlaying == item.id && playingStatus
+                ? 'fa fa-pause'
+                : 'fa fa-play',
+            ]"
+            aria-hidden="true"
+          ></i>
         </div>
       </div>
     </div>
@@ -27,57 +36,63 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "MusicTopSearchResultItem",
   props: ["item", "nextSongIdWhenPlaying"], //接收来自MusicTopRearchResult的item,item有歌曲的所有信息
   data() {
     return {
-      favStatus: false,//未收藏
+      favStatus: false, //未收藏
       playingStatus: false,
-      picUrl: '',
+      picUrl: "",
     };
   },
   computed: {
-    ...mapState(['favSongArr'])
+    ...mapState(["favSongArr"]),
+  },
+  watch: {
+    favSongArr(newVal, oldVal) {
+      const index = newVal.findIndex((item) => item == this.item.id);
+      if (index != -1) {
+        this.favStatus = true;
+      } else {
+        this.favStatus = false;
+      }
+    },
   },
   methods: {
     // 添加下一首歌曲
     addNextSong() {
-      this.$bus.$emit('addNextSongReadyToPlay', this.item.id)
+      this.$bus.$emit("addNextSongReadyToPlay", this.item.id);
     },
     //收藏当前音乐
     favMusic(item) {
       if (!this.favStatus) {
         this.$bus.$emit("addFavMusicToCenterFav", item.id, this.favStatus); //收藏
-        this.favStatus = true
+        this.favStatus = true;
       } else {
         this.$bus.$emit("addFavMusicToCenterFav", item.id, this.favStatus); //取消收藏
-        this.favStatus = false
+        this.favStatus = false;
       }
     },
     playMusic(id) {
-      this.$bus.$emit("getPlayingMusicId", id);//获取播放中的Id发送到MusicBottomPlayer 
+      this.$bus.$emit("getPlayingMusicId", id); //获取播放中的Id发送到MusicBottomPlayer
     },
   },
   mounted() {
-    const index = this.favSongArr.findIndex((item) => item.id == this.item.id)
+    const index = this.favSongArr.findIndex((item) => item == this.item.id);
     if (index != -1) {
-      this.favStatus = true
+      this.favStatus = true;
     }
-    this.$bus.$on("getFavStatus", (status) => {
-      this.favStatus = status
-    })
     this.$bus.$on("playOrPause", (value) => {
       this.playingStatus = value;
     });
     this.$axios
-      .get(
-        "https://music.cyrilstudio.top/song/detail?ids=" + this.item.id
-      ).then((res) => {
-        this.picUrl = res.data.songs[0].al.picUrl
-      })
+      .get("https://music.cyrilstudio.top/song/detail?ids=" + this.item.id)
+      .then((res) => {
+        this.picUrl = res.data.songs[0].al.picUrl;
+      });
   },
 };
 </script>
@@ -110,9 +125,9 @@ export default {
   display: inline-block;
   min-width: 100%;
   white-space: nowrap;
-  /* animation: moving 15s linear infinite; */
   animation-direction: alternate;
   font-size: 20px;
+  color: #626262;
 }
 
 @keyframes moving {
@@ -129,9 +144,8 @@ export default {
   display: inline-block;
   min-width: 100%;
   white-space: nowrap;
-  /* animation: moving 15s linear infinite; */
   font-size: 16px;
-  color: #525252;
+  color: #626262;
 }
 
 .searchResult-box .control-btn {
@@ -142,7 +156,7 @@ export default {
 .add-fav,
 .play-now {
   cursor: pointer;
-  color: #d6d6d6;
+  color: #626262;
   text-align: center;
   width: 30px;
   height: 30px;

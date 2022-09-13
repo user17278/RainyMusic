@@ -9,11 +9,23 @@
             <span>Click To Add</span>
           </div>
         </label>
-        <input id="file" ref="file" type="file" accept=".mp3" multiple @change="handleChange" style="display: none" />
+        <input
+          id="file"
+          ref="file"
+          type="file"
+          accept=".mp3"
+          multiple
+          @change="handleChange"
+          style="display: none"
+        />
       </div>
     </div>
     <div class="song-show" ref="songShow">
-      <div class="side-bar-btn" v-on:click="makeSideBarHideLeft" ref="sideBarBtnLeft">
+      <div
+        class="side-bar-btn"
+        v-on:click="makeSideBarHideLeft"
+        ref="sideBarBtnLeft"
+      >
         <div class="side-bar-center" ref="sideBarCenter">
           <i class="fa fa-bars" aria-hidden="true"></i>
         </div>
@@ -31,24 +43,26 @@
           </span>
         </div>
       </div>
-      <div class="side-bar-btn-right" v-on:click="makeSideBarHideRight" ref="sideBarBtnRight">
+      <div
+        class="side-bar-btn-right"
+        v-on:click="makeSideBarHideRight"
+        ref="sideBarBtnRight"
+      >
         <div class="side-bar-center" ref="sideBarCenter">
           <i class="fa fa-bars" aria-hidden="true"></i>
         </div>
       </div>
     </div>
     <MusicCenterLyric ref="songLyric" />
-    <MusicCenterVideo v-show="isVideo" />
   </div>
 </template>
 
 <script>
-import MusicCenterFav from "./MusicCenterFav.vue"
-import MusicCenterLyric from "./MusicCenterLyric.vue"
-import MusicCenterVideo from "./MusicCenterVideo.vue"
+import MusicCenterFav from "./MusicCenterFav.vue";
+import MusicCenterLyric from "./MusicCenterLyric.vue";
 export default {
   name: "MusicCenter",
-  components: { MusicCenterFav, MusicCenterLyric, MusicCenterVideo },
+  components: { MusicCenterFav, MusicCenterLyric },
   props: ["cookie"],
   data() {
     return {
@@ -71,34 +85,31 @@ export default {
     },
     sideBarShowLeft: function () {
       // console.log('左边显示');
-      this.$refs.songList.style.flex = 1
-      this.$refs.sideBarBtnLeft.style.left = '-15px'
-      this.isSideBarHideLeft = false
-
+      this.$refs.songList.style.flex = 1;
+      this.$refs.sideBarBtnLeft.style.left = "-15px";
+      this.isSideBarHideLeft = false;
     },
     sideBarHideLeft: function () {
       // console.log('左边隐藏');
-      this.$refs.songList.style.flex = 0
-      this.$refs.sideBarBtnLeft.style.left = '0px'
-      this.isSideBarHideLeft = true
-
+      this.$refs.songList.style.flex = 0;
+      this.$refs.sideBarBtnLeft.style.left = "0px";
+      this.isSideBarHideLeft = true;
     },
     sideBarShowRight: function () {
       // console.log('右边显示');
-      const songLyric = this.$refs.songLyric
-      songLyric.$refs.lyricShow.style.flex = 1
-      this.$refs.songShow.style.flex = 1.5
-      this.$refs.sideBarBtnRight.style.right = '-15px';
-      this.isSideBarHideRight = false
-
+      const songLyric = this.$refs.songLyric;
+      songLyric.$refs.lyricShow.style.flex = 1;
+      this.$refs.songShow.style.flex = 1.5;
+      this.$refs.sideBarBtnRight.style.right = "-15px";
+      this.isSideBarHideRight = false;
     },
     sideBarHideRight: function () {
       // console.log('右边隐藏');
-      const songLyric = this.$refs.songLyric
-      songLyric.$refs.lyricShow.style.flex = 0
-      this.$refs.sideBarBtnRight.style.right = '0px';
-      this.$refs.songShow.style.flex = 1.5
-      this.isSideBarHideRight = true
+      const songLyric = this.$refs.songLyric;
+      songLyric.$refs.lyricShow.style.flex = 0;
+      this.$refs.sideBarBtnRight.style.right = "0px";
+      this.$refs.songShow.style.flex = 1.5;
+      this.isSideBarHideRight = true;
     },
     makeSideBarHideLeft: function () {
       if (!this.isSideBarHideLeft) {
@@ -113,28 +124,28 @@ export default {
       } else {
         this.sideBarShowRight();
       }
-    }
+    },
   },
   mounted() {
-    this.$bus.$on('getPlayingMusicDetailToCenter', (item) => {
+    this.$bus.$on("getPlayingMusicDetailToCenter", (item) => {
       this.$set(this.playingMusicDetail, "musicName", item.name);
       this.$set(this.playingMusicDetail, "musicArtist", item.ar[0].name);
       this.$set(this.playingMusicDetail, "picUrl", item.al.picUrl);
-    })
+    });
     this.$bus.$on("getFavSongArr", (newValue) => {
       this.favSongArr = newValue;
     });
-    this.$bus.$on('controlVideoShow', (status) => {
-      this.isVideo = status
-    })
-    this.$bus.$on('videoBtnClick', () => {
+    this.$bus.$on("controlVideoShow", (status) => {
+      this.isVideo = status;
+    });
+    this.$bus.$on("videoBtnClick", () => {
       this.makeSideBarHideLeft();
-    })
+    });
   },
   beforeDestroy() {
     this.$bus.$off("getFavSongArr");
-    this.$bus.$off('controlVideoShow')
-    this.$bus.$off('videoBtnClick')
+    this.$bus.$off("controlVideoShow");
+    this.$bus.$off("videoBtnClick");
   },
 };
 </script>
@@ -162,10 +173,9 @@ export default {
 .song-list {
   flex-direction: column;
   flex: 1;
-  background-color: royalblue;
   overflow: auto;
-  transition: .8s cubic-bezier(.27, -0.01, .34, 1);
-
+  transition: 0.8s cubic-bezier(0.27, -0.01, 0.34, 1);
+  background-color: royalblue;
 
   .empty-fav-mask {
     display: flex;
@@ -206,7 +216,7 @@ export default {
     z-index: 10;
 
     .side-bar-center::before {
-      content: '';
+      content: "";
       width: 16px;
       height: 16px;
       background-color: transparent;
@@ -235,23 +245,19 @@ export default {
     }
 
     .side-bar-center::after {
-      content: '';
+      content: "";
       width: 16px;
       height: 16px;
       background-color: transparent;
       border-radius: 50%;
-      /* box-shadow: 9px -8px 0 white; */
       box-shadow: $hshadow $vshadow $blur $color;
       position: absolute;
       top: 50px;
     }
-
-
   }
 
   .side-bar-btn-right {
     position: absolute;
-    // margin-left: 500px;
     right: -15px;
     top: 50%;
     transform: rotate(180deg) translateY(50%);
@@ -259,7 +265,7 @@ export default {
     z-index: 10;
 
     .side-bar-center::before {
-      content: '';
+      content: "";
       width: 16px;
       height: 16px;
       background-color: transparent;
@@ -288,18 +294,16 @@ export default {
     }
 
     .side-bar-center::after {
-      content: '';
+      content: "";
       width: 16px;
       height: 16px;
       background-color: transparent;
       border-radius: 50%;
-      /* box-shadow: 9px -8px 0 white; */
       box-shadow: $hshadow $vshadow $blur $color;
       position: absolute;
       top: 50px;
     }
   }
-
 
   .song-show-box {
     width: 320px;
@@ -334,7 +338,7 @@ export default {
         display: inline-block;
         min-width: 100%;
         margin-top: 30px;
-        color: black;
+        color: #626262;
         white-space: nowrap;
         animation: moving 15s linear alternate infinite;
         user-select: none;
@@ -346,7 +350,6 @@ export default {
 
       .author {
         font-size: 20px;
-        color: #353535;
       }
     }
   }

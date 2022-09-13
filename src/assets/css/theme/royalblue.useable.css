@@ -1,0 +1,62 @@
+.song-list,
+.lyric-show {
+    background-color: royalblue !important;
+    transition: 1s !important;
+}
+
+
+.lyric-show-layer {
+    background-image: linear-gradient(0deg, royalblue 20%,
+            rgba(255, 255, 255, 0) 40%,
+            rgba(255, 255, 255, 0) 60%,
+            royalblue 80%) !important;
+    transition: 1s !important;
+}
+
+.fav-list-box {
+    margin-top: 10px !important;
+    background-color: white;
+    border-radius: 16px;
+    transition: 1s !important;
+}
+
+.fav-list-song *,
+.control-btn * {
+    color: #626262;
+    transition: 1s !important;
+
+}
+
+.user .user-logout,
+.user .user-login {
+    border: solid 2px #d6d6d6 !important;
+    transition: 1s !important;
+
+}
+
+
+.song-list .empty-fav-mask * {
+    color: #626262 !important;
+    transition: 1s !important;
+
+}
+
+.player-progressBar .player-progressBar-box .player-progessBar-box-line,
+.player .volume-bar .volume-bar-line {
+    background-color: #626262 !important;
+    transition: 1s !important;
+
+}
+
+.theme-change {
+    border: solid 2px #d6d6d6 !important;
+    transition: 1s !important;
+
+}
+
+.cloth,
+.user-login i,
+.user-logout i {
+    color: #d6d6d6 !important;
+    transition: 1s !important;
+}

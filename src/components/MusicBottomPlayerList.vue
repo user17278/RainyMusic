@@ -40,7 +40,6 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
 export default {
     name: "MusicBottomPlayerList",
     props: ['item', 'nextSongIdWhenPlaying'],
@@ -53,18 +52,17 @@ export default {
         }
     },
     computed: {
-        ...mapState(['favSongArr']),
-        ...mapGetters(['getFavSongArr']),
+        isFavChange() {
+            return this.$store.state.favSongArr;//需要监听的数据
+        }
     },
     watch: {
-        getFavSongArr: {
-            handler(newValue, oldValue) {
-                const index = newValue.findIndex((item) => item.id == this.item.id)
-                if (index != -1) {
-                    this.favStatus = true
-                } else {
-                    this.favStatus = false
-                }
+        isFavChange(newVal, oldVal) {
+            const index = newVal.findIndex((item) => item == this.item.id)
+            if (index != -1) {
+                this.favStatus = true
+            } else {
+                this.favStatus = false
             }
         }
     },
@@ -78,10 +76,10 @@ export default {
         //收藏当前音乐
         favMusic(item) {
             if (!this.favStatus) {
-                this.$bus.$emit("addFavMusicToCenterFav", this.item.id, this.favStatus); //收藏
+                this.$bus.$emit("addFavMusicToCenterFav", item.id, this.favStatus); //收藏
                 this.favStatus = true
             } else {
-                this.$bus.$emit("addFavMusicToCenterFav", this.item.id, this.favStatus); //取消收藏
+                this.$bus.$emit("addFavMusicToCenterFav", item.id, this.favStatus); //取消收藏
                 this.favStatus = false
             }
         },
@@ -94,12 +92,6 @@ export default {
         }
     },
     mounted() {
-        const index = this.favSongArr.findIndex((item) => item.id == this.item.id)
-        if (index != -1) {
-            this.favStatus = true
-        } else {
-            this.favStatus = false
-        }
         this.$bus.$on("playOrPause", (value) => {
             this.playingStatus = value;
         });
@@ -161,12 +153,12 @@ label {
         .next-song-list-detail-musicName {
             margin-bottom: 5px;
             font-size: 16px;
-            color: black;
+            color: rgb(83, 83, 83);
         }
 
         .next-song-list-detail-musicAuthor {
             font-size: 12px;
-            color: black;
+            color: rgb(83, 83, 83);
         }
 
         div {
@@ -218,6 +210,11 @@ label {
                 font-size: 18px;
                 cursor: pointer;
             }
+        }
+
+        .add-fav i,
+        .play-now i {
+            color: rgb(83, 83, 83);
         }
     }
 }

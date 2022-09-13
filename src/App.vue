@@ -32,7 +32,6 @@ export default {
   },
 };
 </script>
-
 <style>
 * {
   margin: 0;
@@ -41,7 +40,6 @@ export default {
 }
 
 body {
-
   overflow: hidden;
 }
 

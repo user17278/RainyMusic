@@ -14,20 +14,23 @@ Vue.use(Vuex)
 // 创建并导出store
 export default new Vuex.Store({
     state: {
+        loginStatus: false,
+        username: '',
+        token: '',
         favSongArr: [],
+        // favSongIdArr: [],
     },
     mutations: {
         addToFavSongArr(state, arr) {
-            state.favSongArr = arr
+            state.favSongArr = []
+            arr.forEach(item => {
+                state.favSongArr.push(item.id)
+            });
         }
     },
     actions: {
-
     },
     getters: {
-        getFavSongArr(state) {
-            return state.favSongArr
-        }
     }
 })
 

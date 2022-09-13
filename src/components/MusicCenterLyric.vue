@@ -1,10 +1,18 @@
 <template>
   <div class="lyric-show" ref="lyricShow">
-    <MusicCenterLyricScroll class="lyric-show-box" v-if="playingStatus" :data="currentLyric && currentLyric.lines"
-      ref="lyricList">
+    <MusicCenterLyricScroll
+      class="lyric-show-box"
+      :data="currentLyric && currentLyric.lines"
+      ref="lyricList"
+    >
       <ul class="content">
-        <li v-for="(line, index) in currentLyric.lines" :key="index" :line="line" ref="lyricLine"
-          :class="{ current: currentLineNum === index }">
+        <li
+          v-for="(line, index) in currentLyric.lines"
+          :key="index"
+          :line="line"
+          ref="lyricLine"
+          :class="{ current: currentLineNum === index }"
+        >
           {{ line.txt }}
         </li>
       </ul>
@@ -21,10 +29,15 @@ export default {
   components: { MusicCenterLyricScroll },
   data() {
     return {
-      currentLyric: null,
+      // currentLyric: null,
+      currentLyric: {
+        lyricLine: 0,
+        lines: 0,
+        lrc: [],
+      },
       currentLineNum: 0,
       currentSongId: null,
-      playingStatus: false
+      playingStatus: false,
     };
   },
   methods: {
@@ -34,17 +47,17 @@ export default {
         // let lyricEl = this.$refs.lyricLine[lineNum];
         //调用scroll组件API
         // this.$refs.lyricList.scrollToElement(lyricEl, 1000);
-        let lineEl = this.$refs.lyricLine[lineNum]
+        let lineEl = this.$refs.lyricLine[lineNum];
         if (this.$refs.lyricList) {
           this.$nextTick(() => {
-            this.$refs.lyricList.scrollToElement(lineEl, 1000)
-          })
+            this.$refs.lyricList.scrollToElement(lineEl, 1000);
+          });
         }
       } else {
         if (this.$refs.lyricList) {
           this.$nextTick(() => {
-            this.$refs.lyricList.scrollTo(0, 0, 1000)
-          })
+            this.$refs.lyricList.scrollTo(0, 0, 1000);
+          });
         }
       }
       this.currentLineNum = lineNum;
@@ -53,15 +66,16 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.$bus.$on("toCurrentLyric", (lyric, songId) => {
-        this.currentLyric = null//清空原歌词
-        this.currentLineNum = 0//切歌恢复当前行 
+        this.currentLyric = null; //清空原歌词
+        this.currentLineNum = 0; //切歌恢复当前行
         this.currentSongId = songId;
         this.currentLyric = new Lyric(lyric, this.handleLyric);
+        console.log(this.currentLyric);
         this.currentLyric.play();
       });
       // 点击暂停按钮暂停歌词滚动
       this.$bus.$on("getPlayingStatusToLyric", (songIsPlay) => {
-        this.playingStatus = songIsPlay.playingStatus
+        this.playingStatus = songIsPlay.playingStatus;
         if (!songIsPlay.playingStatus) {
           this.currentLyric.stop();
         } else {
@@ -87,7 +101,7 @@ export default {
   align-items: center;
   background: royalblue;
   overflow: hidden;
-  transition: .8s cubic-bezier(.27, -0.01, .34, 1);
+  transition: 0.8s cubic-bezier(0.27, -0.01, 0.34, 1);
 }
 
 .lyric-show-layer {
@@ -96,11 +110,13 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: linear-gradient(0deg,
-      rgba(65, 105, 225, 1) 20%,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0) 60%,
-      rgba(65, 105, 225, 1) 80%);
+  background-image: linear-gradient(
+    0deg,
+    rgba(65, 105, 225, 1) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(65, 105, 225, 1) 80%
+  );
 }
 
 .lyric-show-box {
@@ -117,7 +133,7 @@ li {
   margin: 0px 45px;
   margin-bottom: 20px;
   text-align: center;
-  color: rgb(135, 164, 253);
+  color: rgba(255, 255, 255, 0.357);
   font-size: 16px;
   line-height: 18px;
   transition: 0.5s;

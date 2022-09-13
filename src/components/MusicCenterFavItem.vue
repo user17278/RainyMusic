@@ -2,12 +2,20 @@
   <li>
     <div class="fav-list-box">
       <div class="img-box" v-on:mouseenter="showImgMask" ref="imgBox">
-        <div class="img-mask" v-show="nextSongIdWhenPlaying == favSongItem.id && playingStatus || isMove">
-          <i :class="[
-            nextSongIdWhenPlaying == favSongItem.id && playingStatus
-              ? 'fa fa-pause'
-              : 'fa fa-play',
-          ]" aria-hidden="true"></i>
+        <div
+          class="img-mask"
+          v-show="
+            (nextSongIdWhenPlaying == favSongItem.id && playingStatus) || isMove
+          "
+        >
+          <i
+            :class="[
+              nextSongIdWhenPlaying == favSongItem.id && playingStatus
+                ? 'fa fa-pause'
+                : 'fa fa-play',
+            ]"
+            aria-hidden="true"
+          ></i>
         </div>
         <img :src="favSongItem.al.picUrl" alt="" />
       </div>
@@ -24,15 +32,23 @@
           <i class="fa fa-plus" aria-hidden="true"></i>
         </div>
         <div class="heart-fav">
-          <i class="fa fa-heart" :style="{ color: '#ff8282' }" aria-hidden="true"
-            v-on:click="moveFromFav(favSongItem.id)"></i>
+          <i
+            class="fa fa-heart"
+            :style="{ color: '#ff8282' }"
+            aria-hidden="true"
+            v-on:click="moveFromFav(favSongItem.id)"
+          ></i>
         </div>
         <div class="play-now" v-on:click="playMusic(favSongItem.id)">
-          <i class="fa fa-play" :class="[
-            nextSongIdWhenPlaying == favSongItem.id && playingStatus
-              ? 'fa fa-pause'
-              : 'fa fa-play',
-          ]" aria-hidden="true"></i>
+          <i
+            class="fa fa-play"
+            :class="[
+              nextSongIdWhenPlaying == favSongItem.id && playingStatus
+                ? 'fa fa-pause'
+                : 'fa fa-play',
+            ]"
+            aria-hidden="true"
+          ></i>
         </div>
       </div>
     </div>
@@ -42,7 +58,7 @@
 <script>
 export default {
   name: "MusicCenterFavItem",
-  props: ["favSongItem", "nextSongIdWhenPlaying",],
+  props: ["favSongItem", "nextSongIdWhenPlaying"],
   data() {
     return {
       favMusicUrl: "",
@@ -54,27 +70,26 @@ export default {
 
   methods: {
     playMusic(id) {
-      this.$bus.$emit("getPlayingMusicId", id);//获取播放中的Id发送到MusicBottomPlayer 
+      this.$bus.$emit("getPlayingMusicId", id); //获取播放中的Id发送到MusicBottomPlayer
     },
     moveFromFav(id) {
-      this.$bus.$emit('removeFavMusic', id)
+      this.$bus.$emit("removeFavMusic", id);
     },
     showImgMask() {
-      this.isMove = true
+      this.isMove = true;
       this.$refs.imgBox.onmouseleave = () => {
-        this.isMove = false
-      }
-    }
+        this.isMove = false;
+      };
+    },
   },
   mounted() {
     this.$bus.$on("playOrPause", (value) => {
       this.playingStatus = value;
     });
   },
-
   beforeDestroy() {
-    this.$bus.$off("playOrPause")
-  }
+    this.$bus.$off("playOrPause");
+  },
 };
 </script>
 
@@ -102,7 +117,6 @@ export default {
       height: 65px;
     }
   }
-
 }
 
 .fav-list-box {
@@ -110,12 +124,9 @@ export default {
   align-items: center;
   height: 65px;
   padding: 6px;
-  margin: 0px 6px;
-  border-bottom: solid 2px rgba(255, 255, 255, 0.123);
-  // background-color: white;
-  // border: solid 1px #d6d6d6;
-  // border-radius: 16px;
-  // margin: 5px;
+  margin: 10px 6px;
+  background-color: white;
+  border-radius: 16px;
 
   .img-box img {
     width: 65px;
@@ -129,7 +140,6 @@ export default {
     flex: 1;
     overflow: hidden;
     margin: 0 6px;
-
     .fav-list-song-musicName {
       font-size: 20px;
     }
@@ -149,10 +159,10 @@ export default {
         white-space: nowrap;
         animation: moving 15s linear infinite;
         animation-direction: alternate;
+        color: #626262;
       }
     }
   }
-
 }
 
 @keyframes moving {
@@ -180,11 +190,11 @@ export default {
     margin-left: 6px;
     margin-right: 6px;
     font-size: 22px;
-    color: white;
     text-align: center;
     cursor: pointer;
 
     i {
+      color: #626262;
       vertical-align: top;
     }
   }

@@ -9,20 +9,20 @@
 import MusicTopSearchResultItem from "./MusicTopSearchResultItem.vue";
 
 export default {
-  name: "MusicTopSearchResult",
-  components: { MusicTopSearchResultItem },
-  props: ["searchResults"],
-  data() {
-    return {
-      nextSongIdWhenPlaying: null,
-    };
-  },
-  mounted() {
-    this.$bus.$on("nextSongIdWhenPlaying", (id) => {
-      this.nextSongIdWhenPlaying = id;
-    });
+name: "MusicTopSearchResult",
+components: { MusicTopSearchResultItem },
+props: ["searchResults"],
+data() {
+return {
+nextSongIdWhenPlaying: null,
+};
+},
+mounted() {
+this.$bus.$on("nextSongIdWhenPlaying", (id) => {
+this.nextSongIdWhenPlaying = id;
+});
+},
 
-  },
 };
 </script>
 
