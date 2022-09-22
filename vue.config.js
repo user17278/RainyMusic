@@ -3,11 +3,14 @@ const { defineConfig } = require('@vue/cli-service');
 module.exports = defineConfig({
   transpileDependencies: true,
 })
-
 module.exports = {
-  assetsDir: 'static',
-  parallel: false,
   publicPath: './',
+  parallel: false,
+  productionSourceMap: false,
+  outputDir: 'dist',
+  assetsDir: 'assets',
+  lintOnSave: true, // 是否开启eslint保存检测
+  productionSourceMap: false, // 是否在构建生产包时生成sourcdeMap
   devServer: {
     proxy: {
       '/user': {
@@ -16,7 +19,15 @@ module.exports = {
         pathRewrite: {
           '^/user': ''
         }
+      },
+      '/fav': {
+        target: 'http://127.0.0.1:3000/fav',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/fav': ''
+        }
       }
     }
-  }
+  },
+
 }

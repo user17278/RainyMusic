@@ -2,7 +2,7 @@
   <div class="center">
     <div class="song-list" ref="songList">
       <MusicCenterFav :cookie="cookie" />
-      <div class="empty-fav-mask" v-if="!favSongArr">
+      <div class="empty-fav-mask" v-if="!this.$store.state.favSongArr.length">
         <label for="file">
           <div class="empty-fav-mask-box">
             <i class="fa fa-plus-square-o" aria-hidden="true"> </i>
@@ -74,7 +74,6 @@ export default {
         isSideBarHideLeft: false,
         isSideBarHideRight: false,
       },
-      favSongArr: 0,
       isVideo: false,
     };
   },
@@ -132,9 +131,6 @@ export default {
       this.$set(this.playingMusicDetail, "musicArtist", item.ar[0].name);
       this.$set(this.playingMusicDetail, "picUrl", item.al.picUrl);
     });
-    this.$bus.$on("getFavSongArr", (newValue) => {
-      this.favSongArr = newValue;
-    });
     this.$bus.$on("controlVideoShow", (status) => {
       this.isVideo = status;
     });
@@ -143,7 +139,7 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$bus.$off("getFavSongArr");
+    this.$bus.$off("getPlayingMusicDetailToCenter");
     this.$bus.$off("controlVideoShow");
     this.$bus.$off("videoBtnClick");
   },

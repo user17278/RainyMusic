@@ -18,6 +18,10 @@
         />
         <router-view></router-view>
       </div>
+      <div class="login-tips" ref="loginTips">
+        <i class="fa fa-info-circle" aria-hidden="true"></i>
+        可以立即使用的账号:Tom密码:123 或 注册新账号
+      </div>
       <div class="user-tips">{{ loginTip }}</div>
       <div class="user-remember">
         <label for="label" @change="clickRememberCheckBox"
@@ -31,7 +35,11 @@
       </div>
       <div class="user-forget">
         <div class="separator"></div>
-        <div><a href="">忘记了 RainyMusic ID 或密码？</a></div>
+        <div>
+          <a href="javascript:alert('无功能~请创建新账号')"
+            >忘记了 RainyMusic ID 或密码？</a
+          >
+        </div>
         <span>没有RainyMusic ID？</span>
         <router-link to="/regUser">立即创建您的 RainyMusic ID。</router-link>
         <div>
@@ -77,7 +85,7 @@ export default {
     idSuccess: function (id) {
       this.clickRememberCheckBox;
       this.$axios
-        .post("user/userNameCheck", {
+        .post("/user/userNameCheck", {
           username: id,
         })
         .then((res) => {
@@ -122,6 +130,9 @@ export default {
       }
       this.$router.push("/");
     },
+    showLoginTips() {
+      this.$refs.loginTips.style.animation = "moving1 8s forwards";
+    },
   },
   mounted() {
     this.$bus.$on("getPwdMsg", (msg) => {
@@ -133,9 +144,13 @@ export default {
       this.idInput = localStorage.getItem("userId");
       this.$refs.rememberCheckBox.checked = true;
     }
+    var that = this;
+    setTimeout(() => {
+      that.showLoginTips();
+    }, 1000);
   },
   beforeDestroy() {
-    this.$bus.$off("hgetPwdMsg");
+    this.$bus.$off("getPwdMsg");
   },
 };
 </script>
@@ -176,6 +191,20 @@ export default {
   margin-right: 16px;
   vertical-align: bottom;
 }
+.fa-info-circle {
+  color: #626262;
+}
+.login-tips {
+  position: absolute;
+  top: 95px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+  font-size: 12px;
+  color: #626262;
+  animation: none;
+  opacity: 0;
+}
 
 .user-name {
   width: 280px;
@@ -200,7 +229,6 @@ export default {
   color: #d6d6d6;
   font-size: 26px;
 }
-
 .user-name input {
   display: block;
   width: 280px;
@@ -211,6 +239,7 @@ export default {
   padding-left: 10px;
   padding-right: 10px;
   font-weight: 100;
+  background-color: white;
 }
 
 input::-webkit-input-placeholder {
@@ -296,5 +325,25 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+</style>
+<style>
+@keyframes moving1 {
+  0% {
+    opacity: 0;
+    top: 95px;
+  }
+  10% {
+    opacity: 1;
+    top: 115px;
+  }
+  90% {
+    opacity: 1;
+    top: 115px;
+  }
+  100% {
+    opacity: 0;
+    top: 95px;
+  }
 }
 </style>

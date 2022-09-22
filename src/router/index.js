@@ -27,6 +27,7 @@ VueRouter.prototype.push = function push(location) {
 
 // 3.创建并且实例化一个路由器并导出
 export default new VueRouter({
+    mode: 'hash',
     // 2.配置路由
     routes: [
         // 第一种写法

@@ -1,9 +1,21 @@
 <template>
   <div class="bottom">
-    <MusicBottomPlayer ref="MusicBottomPlayer" @toControlPlayOrPause="controlPlayOrPause"
-      @toControlVolume="controlVolume" :playingStatus="playingStatus" :videoUrl="videoUrl" />
-    <audio :src="musicUrl" ref="audio" @pause="onPause" @play="onPlay" @timeupdate="onTimeupdate"
-      @loadedmetadata="onLoadedmetadata" @ended="ended"></audio>
+    <MusicBottomPlayer
+      ref="MusicBottomPlayer"
+      @toControlPlayOrPause="controlPlayOrPause"
+      @toControlVolume="controlVolume"
+      :playingStatus="playingStatus"
+      :videoUrl="videoUrl"
+    />
+    <audio
+      :src="musicUrl"
+      ref="audio"
+      @pause="onPause"
+      @play="onPlay"
+      @timeupdate="onTimeupdate"
+      @loadedmetadata="onLoadedmetadata"
+      @ended="ended"
+    ></audio>
   </div>
 </template>
 <!-- 播放组件，接收各种URL -->
@@ -18,8 +30,8 @@ export default {
       playingStatus: false, //播放状态 true暂停 false播放
       musicUrl: null,
       nextSongUrl: null,
-      musicId: null,//目前music
-      mvId: null,//目前mv
+      musicId: null, //目前music
+      mvId: null, //目前mv
       videoUrl: null,
       currentTime: null,
       isVideoPlaying: false,
@@ -72,7 +84,7 @@ export default {
     ended() {
       // 自动切换下一首
       this.$refs.MusicBottomPlayer.nextSong();
-    }
+    },
   },
   computed: {
     // 根据 playingStatus, currentTime 判断是否在播放
@@ -87,9 +99,9 @@ export default {
       handler(newValue, oldValue) {
         if (newValue != oldValue) {
           // 切歌前先暂停当前歌曲，否则切歌会导致歌词滚动被上一首歌影响
-          this.playingStatus = false
+          this.playingStatus = false;
           //musicUrl更新才会再次获取新歌词
-          var that = this
+          var that = this;
           this.$axios
             .get("https://music.cyrilstudio.top/lyric?id=" + this.musicId)
             .then((res) => {
@@ -105,7 +117,6 @@ export default {
               //     that.$bus.$emit('getMusicVideoUrl', res.data.data.url)
               //     that.videoUrl = res.data.data.url
               //     if (res.data.data.url == null) {
-              //       console.log('无法找到视频地址');
               //     }
               //   })
             })
@@ -124,9 +135,9 @@ export default {
     // 监听MV是否在播放
     isVideoPlaying: {
       handler(newValue, oldValue) {
-        return newValue ? this.pause() : this.play()
-      }
-    }
+        return newValue ? this.pause() : this.play();
+      },
+    },
   },
   mounted() {
     this.$refs.audio.volume = 0.1; //默认音量
@@ -134,16 +145,14 @@ export default {
       this.changeCurrentTime(index, maxTime);
     });
     //添加新的播放，MusicBottom组件audio正在播放的url同步
-    this.$bus.$on('getPlayingMusicUrlToBottom', (url, id) => {
+    this.$bus.$on("getPlayingMusicUrlToBottom", (url, id) => {
       this.musicUrl = url;
-      this.musicId = id
-    })
+      this.musicId = id;
+    });
   },
   beforeDestroy() {
     this.$bus.$off("getCurrentTimeIndex");
-    this.$bus.$off("getPlayingMusicUrl");
-    this.$bus.$off('controlVideoShow')
-    this.$bus.$off('getNextSongUrl')
+    this.$bus.$off("getPlayingMusicUrlToBottom");
   },
 };
 </script>

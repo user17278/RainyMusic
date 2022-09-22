@@ -64,29 +64,30 @@ export default {
     },
   },
   mounted() {
+    var that = this;
     this.$nextTick(() => {
       this.$bus.$on("toCurrentLyric", (lyric, songId) => {
         this.currentLyric = null; //清空原歌词
         this.currentLineNum = 0; //切歌恢复当前行
         this.currentSongId = songId;
         this.currentLyric = new Lyric(lyric, this.handleLyric);
-        console.log(this.currentLyric);
         this.currentLyric.play();
       });
       // 点击暂停按钮暂停歌词滚动
       this.$bus.$on("getPlayingStatusToLyric", (songIsPlay) => {
         this.playingStatus = songIsPlay.playingStatus;
         if (!songIsPlay.playingStatus) {
-          this.currentLyric.stop();
+          that.currentLyric.stop();
         } else {
           // 拖动进度条歌词同步
-          this.currentLyric.seek(songIsPlay.currentTime * 1000);
+          that.currentLyric.seek(songIsPlay.currentTime * 1000);
         }
       });
     });
   },
   beforeDestroy() {
     this.$bus.$off("toCurrentLyric");
+    this.$bus.$off("getPlayingStatusToLyric");
   },
 };
 </script>

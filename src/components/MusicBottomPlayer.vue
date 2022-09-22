@@ -83,25 +83,18 @@
         ></i>
         <div
           class="next-song-list-num"
-          v-show="nextSongList.length && nextSongList.length <= 2"
+          v-show="nextSongList.length && nextSongList.length <= 99"
         >
           {{ nextSongList.length }}
         </div>
         <div
           class="next-song-list-num-more"
-          v-show="nextSongList.length && nextSongList.length > 2"
+          v-show="nextSongList.length && nextSongList.length > 99"
         >
           99+
         </div>
       </div>
-      <div class="player-btn-box" id="mv-box">
-        <i
-          class="fa fa-film"
-          aria-hidden="true"
-          v-on:click="getMv"
-          v-show="this.videoUrl"
-        ></i>
-      </div>
+      <div class="player-btn-box" id="mv-box"></div>
       <div class="player-btn-box" id="unused-box">
         <!-- <i class="fa fa-stack-exchange" aria-hidden="true"></i> -->
       </div>
@@ -346,13 +339,13 @@ export default {
       },
     },
   },
-  created() {
-    document.onkeyup = (e) => {
-      if (e.key == " " || e.code == "Space") {
-        this.sendToControlPlayOrPause();
-      }
-    };
-  },
+  // created() {
+  //   document.onkeyup = (e) => {
+  //     if (e.key == " " || e.code == "Space") {
+  //       this.sendToControlPlayOrPause();
+  //     }
+  //   };
+  // },
   mounted() {
     // 从Top获取id后，获取歌曲详细，将图片歌名添加
     this.$bus.$on("getPlayingMusicId", (id) => {
@@ -423,6 +416,11 @@ export default {
       this.$bus.$emit("getPlayingMaxTime", 0);
       this.nextSongList = [];
     }
+  },
+  beforeDestroy() {
+    this.$bus.$off("getPlayingMusicId");
+    this.$bus.$off("removeSongFromNextSongPlayerList");
+    this.$bus.$off("addNextSongReadyToPlay");
   },
 };
 </script>

@@ -1,11 +1,19 @@
 <template>
   <li>
     <div class="searchResult-box">
-      <img :src="picUrl" alt="" />
+      <img :src="picUrl" :alt="pic_err" v-on:click="playMusic(item.id)" />
       <div class="search-result-detail">
-        <div class="search-result-detail-musicName">{{ item.name }}</div>
+        <div class="search-result-detail-musicName">
+          <div class="wrap">
+            <div class="content">{{ item.name }}</div>
+          </div>
+        </div>
         <div class="search-result-detail-musicAuthor">
-          {{ item.artists[0].name }}
+          <div class="wrap">
+            <div class="content">
+              {{ item.artists[0].name }}
+            </div>
+          </div>
         </div>
       </div>
       <div class="control-btn">
@@ -46,6 +54,7 @@ export default {
       favStatus: false, //未收藏
       playingStatus: false,
       picUrl: "",
+      pic_err: "",
     };
   },
   computed: {
@@ -92,7 +101,13 @@ export default {
       .get("https://music.cyrilstudio.top/song/detail?ids=" + this.item.id)
       .then((res) => {
         this.picUrl = res.data.songs[0].al.picUrl;
+      })
+      .catch((err) => {
+        this.pic_err = "noUrl404";
       });
+  },
+  beforeDestroy() {
+    this.$bus.$off("playOrPause");
   },
 };
 </script>
@@ -112,37 +127,37 @@ export default {
   width: 55px;
   height: 55px;
   border-radius: 10px;
+  color: #626262;
+  font-size: 12px;
 }
-
 .search-result-detail {
-  width: 210px;
   overflow: hidden;
-  margin: 0 20px;
+  margin: 0 10px;
+  width: 100%;
   flex: 1;
 }
+.search-result-detail-musicName .wrap {
+  width: 100%;
+  animation: wrap 10s infinite linear;
+}
 
-.search-result-detail-musicName {
-  display: inline-block;
+.search-result-detail-musicName .wrap .content {
+  float: left;
   min-width: 100%;
+  animation: content 10s infinite linear;
   white-space: nowrap;
-  animation-direction: alternate;
   font-size: 20px;
   color: #626262;
 }
 
-@keyframes moving {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(calc(210px - 100%));
-  }
+.search-result-detail-musicAuthor .wrap {
+  width: 100%;
+  animation: wrap 10s infinite linear;
 }
-
-.search-result-detail-musicAuthor {
-  display: inline-block;
+.search-result-detail-musicAuthor .wrap .content {
+  float: left;
   min-width: 100%;
+  animation: content 10s infinite linear;
   white-space: nowrap;
   font-size: 16px;
   color: #626262;
@@ -152,6 +167,27 @@ export default {
   display: flex;
 }
 
+@keyframes wrap {
+  0%,
+  10% {
+    transform: translateX(0);
+  }
+  90%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes content {
+  0%,
+  10% {
+    transform: translateX(0);
+  }
+  90%,
+  100% {
+    transform: translateX(-100%);
+  }
+}
 .add-next,
 .add-fav,
 .play-now {

@@ -18,7 +18,7 @@ export default new Vuex.Store({
         username: '',
         token: '',
         favSongArr: [],
-        // favSongIdArr: [],
+        changeFavSongArr: false
     },
     mutations: {
         addToFavSongArr(state, arr) {
@@ -26,7 +26,7 @@ export default new Vuex.Store({
             arr.forEach(item => {
                 state.favSongArr.push(item.id)
             });
-        }
+        },
     },
     actions: {
     },

@@ -36,9 +36,8 @@
           ><i class="fa fa-user" aria-hidden="true"></i
         ></router-link>
       </div>
-      <div class="username">
-        <span v-show="this.$store.state.username"> Hi,</span
-        >{{ this.$store.state.username }}
+      <div class="username" v-show="this.$store.state.loginStatus">
+        <span>Hi,</span>{{ this.$store.state.username }}
       </div>
     </div>
     <!-- <div class="theme-change user" v-on:click="changeTheme">
@@ -79,7 +78,7 @@ export default {
   components: { MusicTopSearchResult },
   data() {
     return {
-      query: "cold-charix", // 默认搜索
+      query: "cold", // 默认搜索
       resultShowing: false, // 搜索栏周围遮罩层
       searchResults: [], //存放搜索结果
       mvIds: [], //mvId
@@ -94,6 +93,12 @@ export default {
   methods: {
     showTheLoginPage: function () {
       // this.loginStatus = !this.loginStatus;
+      // 退出登录
+      if (this.$store.state.loginStatus) {
+        this.$store.state.token = "";
+        this.$router.push("/");
+        this.$store.state.loginStatus = false;
+      }
     },
 
     getSearchResult: function () {
@@ -106,16 +111,6 @@ export default {
           this.searchOffset
       );
     },
-    getMvId: function () {
-      return this.$axios.get(
-        "https://music.cyrilstudio.top/search?keywords=" +
-          this.query +
-          "&limit=" +
-          this.searchNum +
-          this.searchOffset +
-          "&type=1006"
-      );
-    },
     searchMusic: function () {
       this.isSearch = true;
       this.searchResults = []; //每次重新搜索前清空上次结果
@@ -124,17 +119,9 @@ export default {
       this.$refs.searchInput.style.color = "black";
       var that = this;
       if (this.query.trim()) {
-        this.$axios.all([this.getSearchResult(), this.getMvId()]).then(
-          this.$axios.spread(function (res1, res2) {
+        this.$axios.all([this.getSearchResult()]).then(
+          this.$axios.spread(function (res1) {
             that.searchResults = res1.data.result.songs;
-            // for (let n = 0; n < that.searchNum; n++) {
-            //   for (let m = 0; m < that.searchNum; m++) {
-            //     if (that.searchResults[n].id == res2.data.result.songs[m].id) {
-            //       console.log(n, '有MV');
-            //       that.searchResults[m].mvid = res2.data.result.songs[m].id
-            //     }
-            //   }
-            // }
           })
         );
       } else {
@@ -144,7 +131,6 @@ export default {
     scrollHandle: function () {
       //每次滚动到底部size+10
       this.searchOffset += 10;
-      console.log("添加新结果");
       this.$axios(
         "https://music.cyrilstudio.top/search?keywords=" +
           this.query +
@@ -185,20 +171,13 @@ export default {
       }
     };
   },
+  beforeDestroy() {
+    this.$bus.$off("loginStatus");
+  },
 };
 </script>
 
 <style scoped>
-@font-face {
-  font-family: "iconfont";
-  src: url("//at.alicdn.com/t/c/font_3632701_5j8522ayd5f.woff2?t=1662442901485")
-      format("woff2"),
-    url("//at.alicdn.com/t/c/font_3632701_5j8522ayd5f.woff?t=1662442901485")
-      format("woff"),
-    url("//at.alicdn.com/t/c/font_3632701_5j8522ayd5f.ttf?t=1662442901485")
-      format("truetype");
-}
-
 .cloth {
   line-height: 36px;
   font-family: "iconfont" !important;
@@ -229,7 +208,6 @@ export default {
 
 .search * {
   height: 45px;
-  /* vertical-align: middle; */
 }
 
 .search > input {
@@ -260,18 +238,11 @@ export default {
   margin-left: 10px;
 }
 
-/* .theme-change {
-  left: 80px;
-  width: 36px;
-  height: 36px;
-  border: solid 2px royalblue;
-  border-radius: 50%;
-  text-align: center;
-} */
 .username {
   position: absolute;
   top: 50%;
-  transform: translateX(120%) translateY(-50%);
+  left: 80px;
+  transform: translateY(-50%);
   font-size: 22px;
   color: royalblue;
   white-space: nowrap;

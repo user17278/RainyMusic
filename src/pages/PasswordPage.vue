@@ -19,7 +19,7 @@ export default {
     // 验证密码
     pwdSuccess: function (pwd) {
       this.$axios
-        .post("http://127.0.0.1:3000/user/userLog", {
+        .post("/user/userLog", {
           username: this.$route.params.username,
           password: pwd,
         })
@@ -28,8 +28,12 @@ export default {
           this.$store.state.token = res.data.token;
           this.$store.state.username = this.$route.params.username;
           this.$router.push("/");
+          this.$store.state.changeFavSongArr = true;
           this.$axios
-            .get("http://127.0.0.1:3000/fav/getFav", {
+            .get("/fav/getFav", {
+              params: {
+                username: this.$store.state.username,
+              },
               headers: { Authorization: this.$store.state.token },
             })
             .then((res) => {

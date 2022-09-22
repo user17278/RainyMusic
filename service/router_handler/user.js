@@ -21,7 +21,6 @@ exports.userPasswordCheck = (req, res) => {
 // 注册用户
 exports.userReg = (req, res) => {
     const userInfo = req.body
-    console.log(userInfo);
     // 进行bcrypt加密
     userInfo.password = bcrypt.hashSync(userInfo.password, 10)
     //  定义插入用户的 SQL 语句

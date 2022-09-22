@@ -1,7 +1,11 @@
 <template>
   <ul>
-    <MusicCenterFavItem v-for="favSongItem in this.favSongArr" :key="favSongItem.id" :favSongItem="favSongItem"
-      :nextSongIdWhenPlaying="nextSongIdWhenPlaying" />
+    <MusicCenterFavItem
+      v-for="favSongItem in this.favSongArr"
+      :key="favSongItem.id"
+      :favSongItem="favSongItem"
+      :nextSongIdWhenPlaying="nextSongIdWhenPlaying"
+    />
   </ul>
 </template>
 
@@ -24,8 +28,30 @@ export default {
       });
     },
   },
+  computed: {
+    loginStatus() {
+      return this.$store.state.loginStatus;
+    },
+    changeFavSongArr() {
+      return this.$store.state.changeFavSongArr;
+    },
+  },
+  watch: {
+    // 退出登录清空列表
+    loginStatus(newValue, oldValue) {
+      if (!newValue) {
+        this.favSongArr = [];
+      }
+    },
+    changeFavSongArr(newValue, oldValue) {
+      if (newValue) {
+        console.log(1);
+        this.favSongArr = [];
+      }
+    },
+  },
   mounted() {
-    var that = this
+    var that = this;
     this.$bus.$on("nextSongIdWhenPlaying", (id) => {
       this.nextSongIdWhenPlaying = id;
     });
@@ -34,40 +60,38 @@ export default {
         that.$axios
           .get("https://music.cyrilstudio.top/song/detail?ids=" + id)
           .then(function (res) {
-            that.favSongArr.push(res.data.songs[0])
-          })
+            console.log(res);
+            that.favSongArr.push(res.data.songs[0]);
+          });
       } else {
-        this.moveFromFav(id)
+        this.moveFromFav(id);
       }
     });
-    this.$bus.$on('removeFavMusic', (id) => {
-      const index = this.favSongArr.findIndex((item) => item.id == id)
-      this.favSongArr.splice(index, 1)
-    })
+    this.$bus.$on("removeFavMusic", (id) => {
+      const index = this.favSongArr.findIndex((item) => item.id == id);
+      this.favSongArr.splice(index, 1);
+    });
   },
-  beforeUpdate() {
+  updated() {
+    this.$store.commit("addToFavSongArr", this.favSongArr);
     // 已登录收藏
     if (this.$store.state.loginStatus) {
-      this.$store.commit('addToFavSongArr', this.favSongArr)
-      this.$axios.post('http://127.0.0.1:3000/fav/addFav', {
-        favId: this.$store.state.favSongArr,
-        username: this.$store.state.username
-      }, {
-        headers: { "Authorization": this.$store.state.token }
-      })
+      this.$axios.post(
+        "/fav/addFav",
+        {
+          favId: this.$store.state.favSongArr,
+          username: this.$store.state.username,
+        },
+        {
+          headers: { Authorization: this.$store.state.token },
+        }
+      );
     }
   },
   beforeDestroy() {
     this.$bus.$off("nextSongIdWhenPlaying");
     this.$bus.$off("addFavMusicToCenterFav");
     this.$bus.$off("removeFavMusic");
-  },
-  watch: {
-    "favSongArr.length": {
-      handler(newValue, oldValue) {
-        this.$bus.$emit("getFavSongArr", newValue);
-      },
-    },
   },
 };
 </script>

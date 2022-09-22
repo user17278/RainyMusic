@@ -9,11 +9,11 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueRouter from 'vue-router'
 import 'font-awesome/css/font-awesome.css'
-
 // 引入store
 import store from './store'
 // 引入路由器
 import router from './router'
+
 
 Vue.prototype.$axios = axios
 Vue.use(VueAxios, axios);

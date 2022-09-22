@@ -7,6 +7,7 @@
           v-show="
             (nextSongIdWhenPlaying == favSongItem.id && playingStatus) || isMove
           "
+          v-on:click="playMusic(favSongItem.id)"
         >
           <i
             :class="[
@@ -20,11 +21,19 @@
         <img :src="favSongItem.al.picUrl" alt="" />
       </div>
       <div class="fav-list-song" ref="outBox">
-        <div class="fav-list-song-musicName box">
-          <span>{{ favSongItem.al.name }} </span>
+        <div class="fav-list-song-musicName">
+          <div class="wrap">
+            <div class="content">
+              {{ favSongItem.name }}
+            </div>
+          </div>
         </div>
-        <div class="fav-list-song-musicAuthor box">
-          <span>{{ favSongItem.ar[0].name }}</span>
+        <div class="fav-list-song-musicAuthor">
+          <div class="wrap">
+            <div class="content">
+              {{ favSongItem.ar[0].name }}
+            </div>
+          </div>
         </div>
       </div>
       <div class="control-btn">
@@ -141,37 +150,57 @@ export default {
     overflow: hidden;
     margin: 0 6px;
     .fav-list-song-musicName {
-      font-size: 20px;
+      .wrap {
+        width: 100%;
+        animation: wrap 10s infinite linear;
+        .content {
+          float: left;
+          min-width: 100%;
+          animation: content 10s infinite linear;
+          white-space: nowrap;
+          font-size: 20px;
+          color: #626262;
+        }
+      }
     }
 
     .fav-list-song-musicAuthor {
-      margin-top: 6px;
-      font-size: 16px;
-    }
-
-    .box {
-      flex: 1;
-      overflow: hidden;
-
-      span {
-        display: inline-block;
-        min-width: 160px;
-        white-space: nowrap;
-        animation: moving 15s linear infinite;
-        animation-direction: alternate;
-        color: #626262;
+      .wrap {
+        width: 100%;
+        animation: wrap 10s infinite linear;
+        .content {
+          float: left;
+          min-width: 100%;
+          animation: content 10s infinite linear;
+          white-space: nowrap;
+          font-size: 16px;
+          color: #626262;
+          margin-top: 6px;
+        }
       }
     }
   }
 }
 
-@keyframes moving {
-  0% {
+@keyframes wrap {
+  0%,
+  10% {
     transform: translateX(0);
   }
-
+  90%,
   100% {
-    transform: translateX(calc(160px - 100%));
+    transform: translateX(100%);
+  }
+}
+
+@keyframes content {
+  0%,
+  10% {
+    transform: translateX(0);
+  }
+  90%,
+  100% {
+    transform: translateX(-100%);
   }
 }
 
