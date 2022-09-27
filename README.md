@@ -11,8 +11,7 @@
 本地部署我的项目（https://github.com/user17278/RainyMusic)  
 运行服务器，在service文件夹中  
 再部署来自Binaryify的（https://github.com/Binaryify/NeteaseCloudMusicApi)  的服务器就能正常运行，体验完整的网站。
-## 安装
-
+### 按照以下步骤本地部署我的项目
 ```shell
 $ git clone git@github.com:Binaryify/NeteaseCloudMusicApi.git
 $ cd NeteaseCloudMusicApi
