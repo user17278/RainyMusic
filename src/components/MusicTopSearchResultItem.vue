@@ -11,7 +11,7 @@
         <div class="search-result-detail-musicAuthor">
           <div class="wrap">
             <div class="content">
-              {{ item.artists[0].name }}
+              {{ item.ar[0].name }}
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 
 export default {
   name: "MusicTopSearchResultItem",
@@ -98,7 +98,7 @@ export default {
       this.playingStatus = value;
     });
     this.$axios
-      .get("https://music.cyrilstudio.top/song/detail?ids=" + this.item.id)
+      .get("http://localhost:3000/song/detail?ids=" + this.item.id)
       .then((res) => {
         this.picUrl = res.data.songs[0].al.picUrl;
       })

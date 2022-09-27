@@ -103,7 +103,7 @@ export default {
           //musicUrl更新才会再次获取新歌词
           var that = this;
           this.$axios
-            .get("https://music.cyrilstudio.top/lyric?id=" + this.musicId)
+            .get("http://localhost:3000/lyric?id=" + this.musicId)
             .then((res) => {
               this.$bus.$emit(
                 "toCurrentLyric",
@@ -111,14 +111,6 @@ export default {
                 this.musicId,
                 this.playingStatus
               );
-              // // 开始获取mv地址
-              // this.$axios.get("https://music.cyrilstudio.top/mv/url?id=" + this.mvId)
-              //   .then((res) => {
-              //     that.$bus.$emit('getMusicVideoUrl', res.data.data.url)
-              //     that.videoUrl = res.data.data.url
-              //     if (res.data.data.url == null) {
-              //     }
-              //   })
             })
             .then(() => {
               if (!this.isVideoPlaying) this.$refs.audio.play(); //歌词显示后再播放

@@ -92,7 +92,6 @@ export default {
   },
   methods: {
     showTheLoginPage: function () {
-      // this.loginStatus = !this.loginStatus;
       // 退出登录
       if (this.$store.state.loginStatus) {
         this.$store.state.token = "";
@@ -103,7 +102,7 @@ export default {
 
     getSearchResult: function () {
       return this.$axios.get(
-        "https://music.cyrilstudio.top/search?keywords=" +
+        "http://localhost:3000/search?keywords=" +
           this.query +
           "&limit=" +
           this.searchNum +
@@ -122,6 +121,7 @@ export default {
         this.$axios.all([this.getSearchResult()]).then(
           this.$axios.spread(function (res1) {
             that.searchResults = res1.data.result.songs;
+            console.log(that.searchResults);
           })
         );
       } else {
@@ -132,7 +132,7 @@ export default {
       //每次滚动到底部size+10
       this.searchOffset += 10;
       this.$axios(
-        "https://music.cyrilstudio.top/search?keywords=" +
+        "http://localhost:3000/search?keywords=" +
           this.query +
           "&limit=" +
           this.searchNum +

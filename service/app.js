@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3307
 // 导入login子路由
 const user = require('./router/user')
 const fav = require('./router/fav')
@@ -44,5 +44,5 @@ app.use(function (err, req, res, next) {
 
 })
 app.listen(port, () => {
-    console.log('服务器运行在http://127.0.0.1:3000');
+    console.log('服务器运行在http://127.0.0.1:3307');
 })

@@ -45,7 +45,6 @@ export default {
     },
     changeFavSongArr(newValue, oldValue) {
       if (newValue) {
-        console.log(1);
         this.favSongArr = [];
       }
     },
@@ -58,7 +57,7 @@ export default {
     this.$bus.$on("addFavMusicToCenterFav", (id, favStatus) => {
       if (!favStatus) {
         that.$axios
-          .get("https://music.cyrilstudio.top/song/detail?ids=" + id)
+          .get("http://localhost:3000/song/detail?ids=" + id)
           .then(function (res) {
             console.log(res);
             that.favSongArr.push(res.data.songs[0]);

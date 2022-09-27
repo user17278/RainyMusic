@@ -57,12 +57,6 @@ export default {
           "moving-out 1s ease-in-out forwards";
       }, 5000);
     }
-    // var that = this;
-    // this.$axios
-    //   .get("http://localhost:3000/register/anonimous")
-    //   .then(function (res) {
-    //     that.cookie = encodeURIComponent(res.data.cookie);
-    //   });
   },
 };
 </script>

@@ -14,14 +14,14 @@ module.exports = {
   devServer: {
     proxy: {
       '/user': {
-        target: 'http://127.0.0.1:3000/user',
+        target: 'http://127.0.0.1:3307/user',
         changeOrigin: true,
         pathRewrite: {
           '^/user': ''
         }
       },
       '/fav': {
-        target: 'http://127.0.0.1:3000/fav',
+        target: 'http://127.0.0.1:3307/fav',
         changeOrigin: true,
         pathRewrite: {
           '^/fav': ''

@@ -354,8 +354,9 @@ export default {
       const index = this.nextSongList.findIndex((nextSongListItem) => {
         return nextSongListItem.id == id;
       });
+      console.log(id);
       that.$axios
-        .get("https://music.cyrilstudio.top/song/detail?ids=" + id)
+        .get("http://localhost:3000/song/detail?ids=" + id)
         // 歌曲详细，添加到nextSongList数组中
         .then(function (res) {
           if (index == -1) {
@@ -377,7 +378,7 @@ export default {
         return nextSongListItem.id == id;
       });
       that.$axios
-        .get("https://music.cyrilstudio.top/song/detail?ids=" + id)
+        .get("http://localhost:3000/song/detail?ids=" + id)
         // 歌曲详细，添加到nextSongList数组中
         .then(function (res) {
           if (index == -1) {

@@ -1,7 +1,11 @@
 <template>
   <ul>
-    <MusicTopSearchResultItem v-for="item in this.searchResults" :key="item.id" :item="item"
-      :nextSongIdWhenPlaying="nextSongIdWhenPlaying" />
+    <MusicTopSearchResultItem
+      v-for="item in searchResults"
+      :item="item"
+      :key="item.id"
+      :nextSongIdWhenPlaying="nextSongIdWhenPlaying"
+    />
   </ul>
 </template>
 
@@ -9,22 +13,21 @@
 import MusicTopSearchResultItem from "./MusicTopSearchResultItem.vue";
 
 export default {
-name: "MusicTopSearchResult",
-components: { MusicTopSearchResultItem },
-props: ["searchResults"],
-data() {
-return {
-nextSongIdWhenPlaying: null,
-};
-},
-mounted() {
-this.$bus.$on("nextSongIdWhenPlaying", (id) => {
-this.nextSongIdWhenPlaying = id;
-});
-},
-
+  name: "MusicTopSearchResult",
+  components: { MusicTopSearchResultItem },
+  props: ["searchResults"],
+  data() {
+    return {
+      nextSongIdWhenPlaying: null,
+    };
+  },
+  updated() {
+    console.log(this.searchResults);
+    this.$bus.$on("nextSongIdWhenPlaying", (id) => {
+      this.nextSongIdWhenPlaying = id;
+    });
+  },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
