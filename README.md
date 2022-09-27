@@ -20,6 +20,9 @@
 
 ```shell
 $ git clone https://github.com/user17278/RainyMusic.git
+OR
+$ git clone git@github.com:user17278/RainyMusic.git
+
 $ cd RainyMusic
 $ npm install
 ```
