@@ -41,7 +41,7 @@ $ node app.js
 现在已经能够实现登录，注册等等，以及查看网页的功能
 ### 部署获取音乐的服务器
 ```shell
-$ git clone https://github.com/Binaryify/NeteaseCloudMusicApi.git
+$ git clone git@github.com:Binaryify/NeteaseCloudMusicApi.git
 $ cd RainyMusic
 $ npm install
 ```
