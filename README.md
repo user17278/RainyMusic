@@ -19,7 +19,7 @@
 ### 按照以下步骤本地部署我的项目
 
 ```shell
-$ git clone https://github.com/Binaryify/NeteaseCloudMusicApi.git
+$ git clone https://github.com/user17278/RainyMusic.git
 $ cd RainyMusic
 $ npm install
 ```
@@ -34,11 +34,7 @@ $ cd service
 $ node app.js
 ```
 服务器启动默认端口为 3307
-,不想使用3307，windows 下使用 git-bash 或者 cmder 等终端执行以下命令:
 
-```shell
-$ set PORT=？？？ && node app.js
-```
 现在已经能够实现登录，注册等等，以及查看网页的功能
 ### 部署获取音乐的服务器
 ```shell
