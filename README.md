@@ -42,7 +42,7 @@ $ node app.js
 ### 部署获取音乐的服务器
 ```shell
 $ git clone git@github.com:Binaryify/NeteaseCloudMusicApi.git
-$ cd RainyMusic
+$ cd NeteaseCloudMusicApi
 $ npm install
 ```
 
